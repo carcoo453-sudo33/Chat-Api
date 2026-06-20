@@ -1,1 +1,3 @@
 - [Chat API architecture](chat-api-arch.md) — Repository+UoW+MediatR CQRS stack; enums in Models/Enums; Controllers → IMediator → Handlers → IUnitOfWork → Repositories → ChatDbContext
+- [Frontend icon strategy](frontend-icons.md) — Lucide CDN for static icons; inline SVG ICONS map in main.js for dynamic ones; theme switching via CSS [data-theme] selectors only
+- [SortDirection naming conflict](sort-direction-conflict.md) — Custom enum named SortDirection conflicts with MongoDB.Driver.SortDirection; renamed to SortOrder to avoid CS0104 ambiguity

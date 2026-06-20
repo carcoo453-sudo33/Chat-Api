@@ -4,11 +4,30 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Chat API — Realtime Messaging Platform</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/css/style.css" />
+
+  <!-- Apply saved theme instantly to avoid flash -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('chatapi-theme')||
+        (window.matchMedia('(prefers-color-scheme:light)').matches?'light':'dark');
+      document.documentElement.setAttribute('data-theme',t);
+    })();
+  </script>
 </head>
 <body>
+
+<!-- PAGE LOADER -->
+<div id="page-loader" aria-hidden="true">
+  <div class="pl-logo">
+    <div class="pl-dot"></div>
+    Chat API
+    <div class="pl-ring"></div>
+  </div>
+</div>
 
 <!-- NAV -->
 <nav>
@@ -22,22 +41,31 @@
     <a href="/health">Health</a>
   </div>
   <div class="nav-actions">
-    <button class="theme-toggle" id="theme-toggle" title="Toggle theme">☀️</button>
-    <button class="hamburger" id="hamburger" aria-label="Menu" aria-expanded="false">☰</button>
+    <button class="theme-toggle" id="theme-toggle" title="Toggle theme" aria-label="Toggle theme">
+      <span class="icon-sun"><i data-lucide="sun" class="icon-md"></i></span>
+      <span class="icon-moon"><i data-lucide="moon" class="icon-md"></i></span>
+    </button>
+    <button class="hamburger" id="hamburger" aria-label="Menu" aria-expanded="false">
+      <span class="icon-open"><i data-lucide="menu" class="icon-md"></i></span>
+      <span class="icon-close"><i data-lucide="x" class="icon-md"></i></span>
+    </button>
   </div>
 </nav>
 
 <!-- MOBILE MENU -->
 <div class="mobile-menu" id="mobile-menu">
-  <a href="/" class="active">🏠 Home</a>
-  <a href="/docs.html">📖 Docs</a>
-  <a href="/swagger">⚡ Swagger UI</a>
-  <a href="/health">💚 Health</a>
+  <a href="/" class="active"><i data-lucide="home" class="icon-md"></i> Home</a>
+  <a href="/docs.html"><i data-lucide="book-open" class="icon-md"></i> Docs</a>
+  <a href="/swagger"><i data-lucide="zap" class="icon-md"></i> Swagger UI</a>
+  <a href="/health"><i data-lucide="activity" class="icon-md"></i> Health</a>
 </div>
 
 <!-- HERO -->
 <div class="hero">
-  <div class="hero-tag fade-up">⚡ Production-Ready Chat API</div>
+  <div class="hero-tag fade-up">
+    <i data-lucide="zap" class="icon-sm"></i>
+    Production-Ready Chat API
+  </div>
   <h1 class="fade-up fade-up-1">
     Realtime Messaging<br />
     <span id="typewriter" style="color:var(--accent)">Real-time Messaging</span>
@@ -48,8 +76,12 @@
     REST + Realtime in one API.
   </p>
   <div class="hero-actions fade-up fade-up-3">
-    <a href="/swagger" class="btn btn-primary">⚡ Explore Swagger</a>
-    <a href="/docs.html" class="btn btn-outline">📖 API Reference</a>
+    <a href="/swagger" class="btn btn-primary">
+      <i data-lucide="zap" class="icon-sm"></i> Explore Swagger
+    </a>
+    <a href="/docs.html" class="btn btn-outline">
+      <i data-lucide="book-open" class="icon-sm"></i> API Reference
+    </a>
   </div>
 </div>
 
@@ -74,11 +106,11 @@
     </div>
     <div class="status-item">
       <div class="status-dot online"></div>
-      <span>JWT Auth ✓</span>
+      <span>JWT Auth</span>
     </div>
     <div class="status-item">
       <div class="status-dot online"></div>
-      <span>File Storage ✓</span>
+      <span>File Storage</span>
     </div>
   </div>
 </div>
@@ -113,32 +145,32 @@
   </div>
   <div class="grid-3">
     <div class="card">
-      <div class="card-icon">⚡</div>
+      <div class="card-icon ci-blue"><i data-lucide="zap" class="icon-lg"></i></div>
       <h3>SignalR WebSockets</h3>
       <p>Real-time bidirectional communication via SignalR Hub. Automatic fallback to long-polling. Room groups, typing indicators, online presence.</p>
     </div>
     <div class="card">
-      <div class="card-icon">🔐</div>
+      <div class="card-icon ci-purple"><i data-lucide="lock" class="icon-lg"></i></div>
       <h3>JWT Authentication</h3>
       <p>Full identity system with register, login, refresh tokens, role-based access, and password hashing via BCrypt. Secure by default.</p>
     </div>
     <div class="card">
-      <div class="card-icon">🍃</div>
+      <div class="card-icon ci-green"><i data-lucide="leaf" class="icon-lg"></i></div>
       <h3>MongoDB Ready</h3>
       <p>MongoDB.Driver with typed collections. Runs in-memory when no URI is set — zero configuration needed for local development.</p>
     </div>
     <div class="card">
-      <div class="card-icon">🔴</div>
+      <div class="card-icon ci-red"><i data-lucide="database" class="icon-lg"></i></div>
       <h3>Redis Pub/Sub</h3>
       <p>StackExchange.Redis pre-wired for horizontal scaling. Broadcast messages across multiple API instances with zero code changes.</p>
     </div>
     <div class="card">
-      <div class="card-icon">📁</div>
+      <div class="card-icon ci-orange"><i data-lucide="paperclip" class="icon-lg"></i></div>
       <h3>Blob File Uploads</h3>
       <p>Upload images, documents, and media files up to 20 MB. Files auto-attach to messages with direct download URLs.</p>
     </div>
     <div class="card">
-      <div class="card-icon">📖</div>
+      <div class="card-icon ci-blue"><i data-lucide="book-open" class="icon-lg"></i></div>
       <h3>Full Swagger UI</h3>
       <p>Every endpoint documented with examples, request/response schemas, and live try-it-out. Custom dark theme included.</p>
     </div>
@@ -155,7 +187,10 @@
 
     <!-- AUTH -->
     <div class="endpoint-group">
-      <div class="endpoint-group-title">🔐 Auth <span class="badge badge-purple" style="font-size:.68rem">6 endpoints</span></div>
+      <div class="endpoint-group-title">
+        <i data-lucide="lock" class="icon-md" style="color:var(--accent4)"></i>
+        Auth <span class="badge badge-purple" style="font-size:.68rem">6 endpoints</span>
+      </div>
       <div class="grid-2">
         <div class="endpoint-card"><div class="endpoint-header"><span class="method method-post">POST</span><span class="endpoint-path">/api/auth/register</span></div><div class="endpoint-body"><p>Register a new account, get JWT tokens</p></div></div>
         <div class="endpoint-card"><div class="endpoint-header"><span class="method method-post">POST</span><span class="endpoint-path">/api/auth/login</span></div><div class="endpoint-body"><p>Login, returns access + refresh token</p></div></div>
@@ -168,7 +203,10 @@
 
     <!-- USERS -->
     <div class="endpoint-group">
-      <div class="endpoint-group-title">👤 Users <span class="badge badge-blue" style="font-size:.68rem">6 endpoints</span></div>
+      <div class="endpoint-group-title">
+        <i data-lucide="user" class="icon-md" style="color:var(--accent)"></i>
+        Users <span class="badge badge-blue" style="font-size:.68rem">6 endpoints</span>
+      </div>
       <div class="grid-2">
         <div class="endpoint-card"><div class="endpoint-header"><span class="method method-get">GET</span><span class="endpoint-path">/api/users</span></div><div class="endpoint-body"><p>List all users with online status</p></div></div>
         <div class="endpoint-card"><div class="endpoint-header"><span class="method method-get">GET</span><span class="endpoint-path">/api/users/{id}</span></div><div class="endpoint-body"><p>Get user by ID</p></div></div>
@@ -181,7 +219,10 @@
 
     <!-- ROOMS -->
     <div class="endpoint-group">
-      <div class="endpoint-group-title">💬 Rooms <span class="badge badge-green" style="font-size:.68rem">6 endpoints</span></div>
+      <div class="endpoint-group-title">
+        <i data-lucide="message-square" class="icon-md" style="color:var(--accent2)"></i>
+        Rooms <span class="badge badge-green" style="font-size:.68rem">6 endpoints</span>
+      </div>
       <div class="grid-2">
         <div class="endpoint-card"><div class="endpoint-header"><span class="method method-get">GET</span><span class="endpoint-path">/api/rooms</span></div><div class="endpoint-body"><p>List all chat rooms</p></div></div>
         <div class="endpoint-card"><div class="endpoint-header"><span class="method method-post">POST</span><span class="endpoint-path">/api/rooms</span></div><div class="endpoint-body"><p>Create a room (Direct / Group / Channel)</p></div></div>
@@ -194,7 +235,10 @@
 
     <!-- MESSAGES -->
     <div class="endpoint-group">
-      <div class="endpoint-group-title">✉️ Messages <span class="badge badge-orange" style="font-size:.68rem">6 endpoints</span></div>
+      <div class="endpoint-group-title">
+        <i data-lucide="mail" class="icon-md" style="color:var(--accent5)"></i>
+        Messages <span class="badge badge-orange" style="font-size:.68rem">6 endpoints</span>
+      </div>
       <div class="grid-2">
         <div class="endpoint-card"><div class="endpoint-header"><span class="method method-get">GET</span><span class="endpoint-path">/api/messages/room/{roomId}</span></div><div class="endpoint-body"><p>Paginated message history for a room</p></div></div>
         <div class="endpoint-card"><div class="endpoint-header"><span class="method method-post">POST</span><span class="endpoint-path">/api/messages</span></div><div class="endpoint-body"><p>Send a message — broadcasts via WebSocket</p></div></div>
@@ -207,7 +251,10 @@
 
     <!-- FILES -->
     <div class="endpoint-group">
-      <div class="endpoint-group-title">📎 Files <span class="badge badge-purple" style="font-size:.68rem">2 endpoints</span></div>
+      <div class="endpoint-group-title">
+        <i data-lucide="paperclip" class="icon-md" style="color:var(--accent4)"></i>
+        Files <span class="badge badge-purple" style="font-size:.68rem">2 endpoints</span>
+      </div>
       <div class="grid-2">
         <div class="endpoint-card"><div class="endpoint-header"><span class="method method-post">POST</span><span class="endpoint-path">/api/files/upload</span></div><div class="endpoint-body"><p>Upload file (up to 20 MB). Optionally attach to a room.</p></div></div>
         <div class="endpoint-card"><div class="endpoint-header"><span class="method method-delete">DELETE</span><span class="endpoint-path">/api/files/{fileName}</span></div><div class="endpoint-body"><p>Delete an uploaded file by name</p></div></div>
@@ -219,38 +266,46 @@
 <!-- WEBSOCKET -->
 <section>
   <div class="section-header">
-    <h2>⚡ WebSocket — SignalR Hub</h2>
+    <h2><i data-lucide="wifi" class="icon-lg" style="color:var(--accent);vertical-align:middle;margin-right:6px"></i>WebSocket — SignalR Hub</h2>
     <p>Connect to <code>/hubs/chat</code> for realtime events</p>
   </div>
   <div class="grid-2">
     <div>
-      <h3 style="font-size:.82rem;color:var(--text2);margin-bottom:.85rem;text-transform:uppercase;letter-spacing:.08em;">📤 Client → Server (invoke)</h3>
+      <div class="ws-label">
+        <i data-lucide="upload" class="icon-sm"></i>
+        Client → Server (invoke)
+      </div>
       <div class="ws-demo">
-        <div class="ws-line"><span class="ws-dir-out">▶ JoinRoom</span><span class="ws-key">(roomId)</span></div>
-        <div class="ws-line"><span class="ws-dir-out">▶ LeaveRoom</span><span class="ws-key">(roomId)</span></div>
-        <div class="ws-line"><span class="ws-dir-out">▶ Typing</span><span class="ws-key">(roomId, userId, displayName)</span></div>
-        <div class="ws-line"><span class="ws-dir-out">▶ StopTyping</span><span class="ws-key">(roomId, userId)</span></div>
-        <div class="ws-line"><span class="ws-dir-out">▶ Ping</span><span class="ws-key">() → Pong</span></div>
+        <div class="ws-line"><span class="ws-dir-out">JoinRoom</span><span class="ws-key">(roomId)</span></div>
+        <div class="ws-line"><span class="ws-dir-out">LeaveRoom</span><span class="ws-key">(roomId)</span></div>
+        <div class="ws-line"><span class="ws-dir-out">Typing</span><span class="ws-key">(roomId, userId, displayName)</span></div>
+        <div class="ws-line"><span class="ws-dir-out">StopTyping</span><span class="ws-key">(roomId, userId)</span></div>
+        <div class="ws-line"><span class="ws-dir-out">Ping</span><span class="ws-key">() → Pong</span></div>
       </div>
     </div>
     <div>
-      <h3 style="font-size:.82rem;color:var(--text2);margin-bottom:.85rem;text-transform:uppercase;letter-spacing:.08em;">📥 Server → Client (on)</h3>
+      <div class="ws-label">
+        <i data-lucide="download" class="icon-sm"></i>
+        Server → Client (on)
+      </div>
       <div class="ws-demo">
-        <div class="ws-line"><span class="ws-dir-in">◀ ReceiveMessage</span><span class="ws-key">{ id, roomId, content, … }</span></div>
-        <div class="ws-line"><span class="ws-dir-in">◀ MessageEdited</span><span class="ws-key">{ id, content }</span></div>
-        <div class="ws-line"><span class="ws-dir-in">◀ MessageDeleted</span><span class="ws-key">{ id, roomId }</span></div>
-        <div class="ws-line"><span class="ws-dir-in">◀ UserTyping</span><span class="ws-key">{ roomId, userId, displayName }</span></div>
-        <div class="ws-line"><span class="ws-dir-in">◀ UserOnline</span><span class="ws-key">{ userId }</span></div>
-        <div class="ws-line"><span class="ws-dir-in">◀ UserOffline</span><span class="ws-key">{ userId }</span></div>
-        <div class="ws-line"><span class="ws-dir-in">◀ UserJoinedRoom</span><span class="ws-key">{ roomId }</span></div>
-        <div class="ws-line"><span class="ws-dir-in">◀ Pong</span><span class="ws-key">{ timestamp }</span></div>
+        <div class="ws-line"><span class="ws-dir-in">ReceiveMessage</span><span class="ws-key">{ id, roomId, content, … }</span></div>
+        <div class="ws-line"><span class="ws-dir-in">MessageEdited</span><span class="ws-key">{ id, content }</span></div>
+        <div class="ws-line"><span class="ws-dir-in">MessageDeleted</span><span class="ws-key">{ id, roomId }</span></div>
+        <div class="ws-line"><span class="ws-dir-in">UserTyping</span><span class="ws-key">{ roomId, userId, displayName }</span></div>
+        <div class="ws-line"><span class="ws-dir-in">UserOnline</span><span class="ws-key">{ userId }</span></div>
+        <div class="ws-line"><span class="ws-dir-in">UserOffline</span><span class="ws-key">{ userId }</span></div>
+        <div class="ws-line"><span class="ws-dir-in">UserJoinedRoom</span><span class="ws-key">{ roomId }</span></div>
+        <div class="ws-line"><span class="ws-dir-in">Pong</span><span class="ws-key">{ timestamp }</span></div>
       </div>
     </div>
   </div>
   <div style="margin-top:1.5rem;">
-    <h3 style="font-size:.82rem;color:var(--text2);margin-bottom:.75rem;text-transform:uppercase;letter-spacing:.08em;">Quick connect (JavaScript)</h3>
+    <div class="ws-label" style="margin-bottom:.75rem;">
+      <i data-lucide="terminal" class="icon-sm"></i> Quick connect (JavaScript)
+    </div>
     <div class="code-block" id="ws-snippet" style="position:relative;">
-      <button class="copy-btn" data-target="ws-snippet">Copy</button>
+      <button class="copy-btn">Copy</button>
 <span class="comment">// npm install @microsoft/signalr</span>
 <span class="key">import</span> * as signalR <span class="key">from</span> <span class="str">"@microsoft/signalr"</span>;
 
@@ -296,6 +351,8 @@ connection.on(<span class="str">"ReceiveMessage"</span>, (msg) =&gt; {
   </p>
 </footer>
 
-<script src="/js/main.js"></script>
+<!-- Lucide icons (deferred) -->
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
+<script src="/js/main.js" defer></script>
 </body>
 </html>

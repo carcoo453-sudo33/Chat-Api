@@ -4,34 +4,30 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Chat API — Documentation</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/css/style.css" />
-  <style>
-    /* Info / warn boxes */
-    .info-box {
-      background: rgba(88,166,255,.06); border: 1px solid rgba(88,166,255,.22);
-      border-radius: var(--radius-sm); padding: .9rem 1.1rem; margin: .85rem 0;
-      font-size: .82rem; color: var(--text2);
-      transition: background var(--transition), border-color var(--transition);
-    }
-    .info-box strong { color: var(--accent); }
-    .warn-box {
-      background: rgba(255,166,87,.06); border: 1px solid rgba(255,166,87,.22);
-      border-radius: var(--radius-sm); padding: .9rem 1.1rem; margin: .85rem 0;
-      font-size: .82rem; color: var(--text2);
-      transition: background var(--transition), border-color var(--transition);
-    }
-    .warn-box strong { color: var(--accent5); }
-    .response-block { margin: .9rem 0; }
-    .response-label { font-size: .72rem; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .08em; margin-bottom: .35rem; }
 
-    /* Param table scroll on tiny screens */
-    .param-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: .85rem 0 1.35rem; }
-    .param-table-wrap .param-table { display: table; width: 100%; margin: 0; }
-  </style>
+  <!-- Apply saved theme instantly to avoid flash -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('chatapi-theme')||
+        (window.matchMedia('(prefers-color-scheme:light)').matches?'light':'dark');
+      document.documentElement.setAttribute('data-theme',t);
+    })();
+  </script>
 </head>
 <body>
+
+<!-- PAGE LOADER -->
+<div id="page-loader" aria-hidden="true">
+  <div class="pl-logo">
+    <div class="pl-dot"></div>
+    Chat API
+    <div class="pl-ring"></div>
+  </div>
+</div>
 
 <!-- NAV -->
 <nav>
@@ -45,17 +41,23 @@
     <a href="/health">Health</a>
   </div>
   <div class="nav-actions">
-    <button class="theme-toggle" id="theme-toggle" title="Toggle theme">☀️</button>
-    <button class="hamburger" id="hamburger" aria-label="Menu" aria-expanded="false">☰</button>
+    <button class="theme-toggle" id="theme-toggle" title="Toggle theme" aria-label="Toggle theme">
+      <span class="icon-sun"><i data-lucide="sun" class="icon-md"></i></span>
+      <span class="icon-moon"><i data-lucide="moon" class="icon-md"></i></span>
+    </button>
+    <button class="hamburger" id="hamburger" aria-label="Menu" aria-expanded="false">
+      <span class="icon-open"><i data-lucide="menu" class="icon-md"></i></span>
+      <span class="icon-close"><i data-lucide="x" class="icon-md"></i></span>
+    </button>
   </div>
 </nav>
 
 <!-- MOBILE MENU -->
 <div class="mobile-menu" id="mobile-menu">
-  <a href="/">🏠 Home</a>
-  <a href="/docs.html" class="active">📖 Docs</a>
-  <a href="/swagger">⚡ Swagger UI</a>
-  <a href="/health">💚 Health</a>
+  <a href="/"><i data-lucide="home" class="icon-md"></i> Home</a>
+  <a href="/docs.html" class="active"><i data-lucide="book-open" class="icon-md"></i> Docs</a>
+  <a href="/swagger"><i data-lucide="zap" class="icon-md"></i> Swagger UI</a>
+  <a href="/health"><i data-lucide="activity" class="icon-md"></i> Health</a>
   <div class="mobile-menu-sep"></div>
   <a href="#overview">Overview</a>
   <a href="#auth">Authentication</a>
@@ -67,7 +69,11 @@
 </div>
 
 <!-- SIDEBAR TOGGLE (floating) -->
-<button class="sidebar-toggle" id="sidebar-toggle" title="Toggle sidebar">◀</button>
+<button class="sidebar-toggle" id="sidebar-toggle" title="Toggle sidebar">
+  <span class="st-hide"><i data-lucide="chevron-left" class="icon-md"></i></span>
+  <span class="st-show"><i data-lucide="chevron-right" class="icon-md"></i></span>
+  <span class="st-mobile"><i data-lucide="menu" class="icon-md"></i></span>
+</button>
 
 <!-- DOCS LAYOUT -->
 <div class="docs-layout" id="docs-layout">
@@ -75,9 +81,9 @@
   <!-- SIDEBAR -->
   <aside class="docs-sidebar" id="docs-sidebar">
     <h4>Pages</h4>
-    <a href="/">🏠 Home</a>
-    <a href="/swagger">⚡ Swagger UI</a>
-    <a href="/health">💚 Health</a>
+    <a href="/"><i data-lucide="home" class="icon-sm"></i> Home</a>
+    <a href="/swagger"><i data-lucide="zap" class="icon-sm"></i> Swagger UI</a>
+    <a href="/health"><i data-lucide="activity" class="icon-sm"></i> Health</a>
 
     <h4>Getting Started</h4>
     <a href="#overview">Overview</a>
@@ -137,10 +143,26 @@
     <!-- OVERVIEW -->
     <h2 id="overview">Overview</h2>
     <div class="grid-4" style="margin-bottom:1.35rem;">
-      <div class="card" style="text-align:center;padding:1rem"><div style="font-size:1.35rem">🔐</div><h3 style="font-size:.82rem">Auth</h3><p style="font-size:.76rem">JWT + refresh</p></div>
-      <div class="card" style="text-align:center;padding:1rem"><div style="font-size:1.35rem">👤</div><h3 style="font-size:.82rem">Users</h3><p style="font-size:.76rem">Profiles, presence</p></div>
-      <div class="card" style="text-align:center;padding:1rem"><div style="font-size:1.35rem">💬</div><h3 style="font-size:.82rem">Rooms</h3><p style="font-size:.76rem">Groups, channels</p></div>
-      <div class="card" style="text-align:center;padding:1rem"><div style="font-size:1.35rem">✉️</div><h3 style="font-size:.82rem">Messages</h3><p style="font-size:.76rem">Send, edit, delete</p></div>
+      <div class="card mini-card">
+        <div class="card-icon ci-purple"><i data-lucide="lock" class="icon-lg"></i></div>
+        <h3 style="font-size:.82rem">Auth</h3>
+        <p style="font-size:.76rem">JWT + refresh</p>
+      </div>
+      <div class="card mini-card">
+        <div class="card-icon ci-blue"><i data-lucide="user" class="icon-lg"></i></div>
+        <h3 style="font-size:.82rem">Users</h3>
+        <p style="font-size:.76rem">Profiles, presence</p>
+      </div>
+      <div class="card mini-card">
+        <div class="card-icon ci-green"><i data-lucide="message-square" class="icon-lg"></i></div>
+        <h3 style="font-size:.82rem">Rooms</h3>
+        <p style="font-size:.76rem">Groups, channels</p>
+      </div>
+      <div class="card mini-card">
+        <div class="card-icon ci-orange"><i data-lucide="mail" class="icon-lg"></i></div>
+        <h3 style="font-size:.82rem">Messages</h3>
+        <p style="font-size:.76rem">Send, edit, delete</p>
+      </div>
     </div>
 
     <h2 id="base-url">Base URL</h2>
@@ -151,13 +173,19 @@
     <h2 id="authentication">Authentication</h2>
     <p>Most endpoints require a JWT Bearer token obtained from <code>POST /api/auth/login</code>.</p>
     <div class="info-box">
-      <strong>How to authenticate:</strong><br/>
-      Include the header <code>Authorization: Bearer &lt;accessToken&gt;</code> on every protected request.<br/>
-      Access tokens expire in 60 minutes. Use <code>POST /api/auth/refresh</code> to get a new one silently.
+      <i data-lucide="info" class="icon-sm box-icon"></i>
+      <div class="box-body">
+        <strong>How to authenticate:</strong><br/>
+        Include the header <code>Authorization: Bearer &lt;accessToken&gt;</code> on every protected request.<br/>
+        Access tokens expire in 60 minutes. Use <code>POST /api/auth/refresh</code> to get a new one silently.
+      </div>
     </div>
     <div class="warn-box">
-      <strong>Demo credentials (in-memory seed):</strong><br/>
-      <code>alice / password123</code> (admin) &nbsp;·&nbsp; <code>bob / password123</code> &nbsp;·&nbsp; <code>carla / password123</code>
+      <i data-lucide="alert-triangle" class="icon-sm box-icon"></i>
+      <div class="box-body">
+        <strong>Demo credentials (in-memory seed):</strong><br/>
+        <code>alice / password123</code> (admin) &nbsp;·&nbsp; <code>bob / password123</code> &nbsp;·&nbsp; <code>carla / password123</code>
+      </div>
     </div>
 
     <!-- RESPONSE FORMAT -->
@@ -313,7 +341,7 @@
 {
   <span class="key">"roomId"</span>:   <span class="str">"room_001"</span>,
   <span class="key">"senderId"</span>: <span class="str">"user_001"</span>,
-  <span class="key">"content"</span>:  <span class="str">"Hello world! 👋"</span>,
+  <span class="key">"content"</span>:  <span class="str">"Hello world!"</span>,
   <span class="key">"type"</span>:     <span class="num">0</span>   <span class="comment">// 0=Text, 1=Image, 2=File, 3=System</span>
 }
     </div>
@@ -335,7 +363,12 @@
     <!-- ═══ FILES ═══ -->
     <h2 id="files-upload">POST /api/files/upload</h2>
     <p>Upload a file using <code>multipart/form-data</code>. Max 20 MB. <span class="badge badge-blue">requires auth</span></p>
-    <div class="warn-box"><strong>⚠️ Allowed types:</strong> .jpg, .jpeg, .png, .gif, .webp, .pdf, .txt, .zip, .mp4, .mp3</div>
+    <div class="warn-box">
+      <i data-lucide="alert-triangle" class="icon-sm box-icon"></i>
+      <div class="box-body">
+        <strong>Allowed types:</strong> .jpg, .jpeg, .png, .gif, .webp, .pdf, .txt, .zip, .mp4, .mp3
+      </div>
+    </div>
     <div class="param-table-wrap">
       <table class="param-table">
         <thead><tr><th>Form Field</th><th>Type</th><th>Description</th></tr></thead>
@@ -354,9 +387,12 @@
     <h2 id="ws-connect">WebSocket — Connect</h2>
     <p>The WebSocket hub is powered by <strong>ASP.NET Core SignalR</strong>. Connect using the <code>@microsoft/signalr</code> JS client or any compatible client.</p>
     <div class="info-box">
-      <strong>Endpoint:</strong> <code>/hubs/chat</code><br/>
-      <strong>Auth:</strong> Pass JWT as query string: <code>?access_token=YOUR_JWT</code><br/>
-      <strong>Online presence:</strong> Connection/disconnection automatically broadcasts <code>UserOnline</code> / <code>UserOffline</code>.
+      <i data-lucide="info" class="icon-sm box-icon"></i>
+      <div class="box-body">
+        <strong>Endpoint:</strong> <code>/hubs/chat</code><br/>
+        <strong>Auth:</strong> Pass JWT as query string: <code>?access_token=YOUR_JWT</code><br/>
+        <strong>Online presence:</strong> Connection/disconnection automatically broadcasts <code>UserOnline</code> / <code>UserOffline</code>.
+      </div>
     </div>
 
     <h2 id="ws-events">WebSocket Events Reference</h2>
@@ -418,7 +454,7 @@ conn.on(<span class="str">"UserTyping"</span>, ({ displayName }) =&gt; {
 <span class="key">await</span> conn.invoke(<span class="str">"Typing"</span>, <span class="str">"room_001"</span>, <span class="str">"user_001"</span>, <span class="str">"Alice"</span>);
     </div>
   </main>
-</div><!-- /.docs-layout -->
+</div>
 
 <footer>
   <p>Chat API v1 &nbsp;·&nbsp; .NET 9 &nbsp;·&nbsp;
@@ -429,6 +465,8 @@ conn.on(<span class="str">"UserTyping"</span>, ({ displayName }) =&gt; {
   </p>
 </footer>
 
-<script src="/js/main.js"></script>
+<!-- Lucide icons (deferred) -->
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
+<script src="/js/main.js" defer></script>
 </body>
 </html>
