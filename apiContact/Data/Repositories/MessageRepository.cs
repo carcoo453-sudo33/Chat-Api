@@ -18,6 +18,7 @@ namespace apiContact.Data.Repositories
         }
 
         // ── IRepository<Message> ─────────────────────────────────
+
         public async Task<Message?> GetByIdAsync(string id)
         {
             if (_db.IsInMemory) return _db.Messages.GetValueOrDefault(id);
@@ -51,17 +52,26 @@ namespace apiContact.Data.Repositories
             return entity;
         }
 
+        /// <summary>
+        /// Soft-delete: keeps the record visible (as "[Message deleted]") so
+        /// conversation flow is not broken. Uses BaseEntity.SoftDelete() for
+        /// consistent IsDeleted / DeletedAt / UpdatedAt stamping.
+        /// </summary>
         public async Task<bool> DeleteAsync(string id)
         {
-            // Soft-delete
             var msg = await GetByIdAsync(id);
             if (msg is null) return false;
-            msg.IsDeleted = true;
-            msg.Content   = "[Message deleted]";
+
+            msg.SoftDelete();
+            msg.Content = "[Message deleted]";
+
             if (_db.IsInMemory) { _db.Messages[id] = msg; return true; }
+
             await _col!.UpdateOneAsync(m => m.Id == id,
                 Builders<Message>.Update
                     .Set(m => m.IsDeleted, true)
+                    .Set(m => m.DeletedAt, msg.DeletedAt)
+                    .Set(m => m.UpdatedAt, msg.UpdatedAt)
                     .Set(m => m.Content,   "[Message deleted]"));
             return true;
         }
@@ -84,21 +94,36 @@ namespace apiContact.Data.Repositories
         }
 
         // ── IMessageRepository ───────────────────────────────────
+
+        /// <summary>
+        /// Returns up to <paramref name="limit"/> messages for a room, ordered chronologically
+        /// (oldest first) for display. Internally queries newest-first and re-sorts in memory
+        /// so that pagination always walks backwards in time consistently across both backends.
+        /// </summary>
         public async Task<List<Message>> GetByRoomAsync(string roomId, int limit, int skip)
         {
             if (_db.IsInMemory)
+            {
+                // Step 1: newest-first to pick the right page window.
+                // Step 2: reverse to chronological order for display.
                 return _db.Messages.Values
                     .Where(m => m.RoomId == roomId && !m.IsDeleted)
                     .OrderByDescending(m => m.Timestamp)
                     .Skip(skip).Take(limit)
                     .OrderBy(m => m.Timestamp)
                     .ToList();
+            }
 
-            return await _col!.Find(m => m.RoomId == roomId && !m.IsDeleted)
+            // MongoDB: query newest-first, paginate, then sort ascending in memory.
+            // Chaining two Sort calls in the driver replaces the first, so we re-sort
+            // the fetched page in application memory instead.
+            var page = await _col!
+                .Find(m => m.RoomId == roomId && !m.IsDeleted)
                 .SortByDescending(m => m.Timestamp)
                 .Skip(skip).Limit(limit)
-                .SortBy(m => m.Timestamp)
                 .ToListAsync();
+
+            return page.OrderBy(m => m.Timestamp).ToList();
         }
 
         public async Task<List<Message>> SearchAsync(string roomId, MessageSearchQuery q)
@@ -108,10 +133,10 @@ namespace apiContact.Data.Repositories
                 return ApplyFilter(_db.Messages.Values, roomId, q)
                     .Skip(q.Skip).Take(q.PageSize).ToList();
 
-            var filter = BuildMongoFilter(roomId, q);
-            return await _col!.Find(filter)
+            return await _col!.Find(BuildMongoFilter(roomId, q))
                 .SortByDescending(m => m.Timestamp)
-                .Skip(q.Skip).Limit(q.PageSize).ToListAsync();
+                .Skip(q.Skip).Limit(q.PageSize)
+                .ToListAsync();
         }
 
         public async Task<int> CountSearchAsync(string roomId, MessageSearchQuery q)
@@ -125,13 +150,15 @@ namespace apiContact.Data.Repositories
         {
             var msg = await GetByIdAsync(id);
             if (msg is null || msg.SenderId != senderId) return null;
-            msg.Content  = content;
-            msg.IsEdited = true;
+            msg.Content    = content.Trim();
+            msg.IsEdited   = true;
+            msg.UpdatedAt  = DateTime.UtcNow;
             if (_db.IsInMemory) { _db.Messages[id] = msg; return msg; }
             await _col!.UpdateOneAsync(m => m.Id == id,
                 Builders<Message>.Update
-                    .Set(m => m.Content,  content)
-                    .Set(m => m.IsEdited, true));
+                    .Set(m => m.Content,   msg.Content)
+                    .Set(m => m.IsEdited,  true)
+                    .Set(m => m.UpdatedAt, msg.UpdatedAt));
             return msg;
         }
 
@@ -179,6 +206,7 @@ namespace apiContact.Data.Repositories
         }
 
         // ── Helpers ──────────────────────────────────────────────
+
         private static IEnumerable<Message> ApplyFilter(
             IEnumerable<Message> src, string roomId, MessageSearchQuery q)
         {

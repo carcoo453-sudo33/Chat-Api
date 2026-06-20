@@ -18,23 +18,41 @@ namespace apiContact.Data.Repositories
         }
 
         // ── IRepository<ChatRoom> ───────────────────────────────
+
         public async Task<ChatRoom?> GetByIdAsync(string id)
         {
-            if (_db.IsInMemory) return _db.Rooms.GetValueOrDefault(id);
-            return await _col!.Find(r => r.Id == id).FirstOrDefaultAsync();
+            if (_db.IsInMemory)
+            {
+                var r = _db.Rooms.GetValueOrDefault(id);
+                return r is { IsDeleted: false } ? r : null;
+            }
+            return await _col!.Find(r => r.Id == id && !r.IsDeleted).FirstOrDefaultAsync();
         }
 
         public async Task<List<ChatRoom>> GetAllAsync()
         {
             if (_db.IsInMemory)
-                return _db.Rooms.Values.OrderByDescending(r => r.LastMessageAt).ToList();
-            return await _col!.Find(_ => true).SortByDescending(r => r.LastMessageAt).ToListAsync();
+                return _db.Rooms.Values
+                    .Where(r => !r.IsDeleted)
+                    .OrderByDescending(r => r.LastMessageAt)
+                    .ToList();
+
+            return await _col!
+                .Find(r => !r.IsDeleted)
+                .SortByDescending(r => r.LastMessageAt)
+                .ToListAsync();
         }
 
         public async Task<List<ChatRoom>> FindAsync(Expression<Func<ChatRoom, bool>> predicate)
         {
-            if (_db.IsInMemory) return _db.Rooms.Values.Where(predicate.Compile()).ToList();
-            return await _col!.Find(predicate).ToListAsync();
+            if (_db.IsInMemory)
+                return _db.Rooms.Values
+                    .Where(r => !r.IsDeleted)
+                    .Where(predicate.Compile())
+                    .ToList();
+
+            var notDeleted = Builders<ChatRoom>.Filter.Eq(r => r.IsDeleted, false);
+            return await _col!.Find(notDeleted & predicate).ToListAsync();
         }
 
         public async Task<ChatRoom> AddAsync(ChatRoom entity)
@@ -51,55 +69,81 @@ namespace apiContact.Data.Repositories
             return entity;
         }
 
+        /// <summary>
+        /// Soft-delete: marks the room as deleted rather than removing the record.
+        /// All messages in the room remain intact for audit purposes.
+        /// </summary>
         public async Task<bool> DeleteAsync(string id)
         {
-            if (_db.IsInMemory) return _db.Rooms.Remove(id);
-            var r = await _col!.DeleteOneAsync(r => r.Id == id);
-            return r.DeletedCount > 0;
+            var room = await GetByIdAsync(id);
+            if (room is null) return false;
+
+            room.SoftDelete();
+
+            if (_db.IsInMemory) { _db.Rooms[id] = room; return true; }
+
+            await _col!.UpdateOneAsync(r => r.Id == id,
+                Builders<ChatRoom>.Update
+                    .Set(r => r.IsDeleted, true)
+                    .Set(r => r.DeletedAt, room.DeletedAt)
+                    .Set(r => r.UpdatedAt, room.UpdatedAt));
+            return true;
         }
 
         public async Task<int> CountAsync(Expression<Func<ChatRoom, bool>>? predicate = null)
         {
             if (_db.IsInMemory)
             {
-                var src = _db.Rooms.Values.AsEnumerable();
+                var src = _db.Rooms.Values.Where(r => !r.IsDeleted);
                 return predicate is null ? src.Count() : src.Count(predicate.Compile());
             }
-            var filter = predicate ?? (_ => true);
-            return (int)await _col!.CountDocumentsAsync(filter);
+            var notDeleted = Builders<ChatRoom>.Filter.Eq(r => r.IsDeleted, false);
+            var combined   = predicate is null ? notDeleted : notDeleted & predicate;
+            return (int)await _col!.CountDocumentsAsync(combined);
         }
 
         public async Task<bool> ExistsAsync(Expression<Func<ChatRoom, bool>> predicate)
         {
-            if (_db.IsInMemory) return _db.Rooms.Values.Any(predicate.Compile());
-            return await _col!.Find(predicate).AnyAsync();
+            if (_db.IsInMemory)
+                return _db.Rooms.Values.Where(r => !r.IsDeleted).Any(predicate.Compile());
+
+            var notDeleted = Builders<ChatRoom>.Filter.Eq(r => r.IsDeleted, false);
+            return await _col!.Find(notDeleted & predicate).AnyAsync();
         }
 
         // ── IRoomRepository ──────────────────────────────────────
+
         public async Task<ChatRoom?> GetBySlugAsync(string slug)
         {
             if (_db.IsInMemory)
-                return _db.Rooms.Values.FirstOrDefault(
-                    r => r.Slug.Equals(slug, StringComparison.OrdinalIgnoreCase));
-            return await _col!.Find(r => r.Slug == slug).FirstOrDefaultAsync();
+                return _db.Rooms.Values.FirstOrDefault(r =>
+                    !r.IsDeleted &&
+                    r.Slug.Equals(slug, StringComparison.OrdinalIgnoreCase));
+
+            return await _col!
+                .Find(r => !r.IsDeleted && r.Slug == slug)
+                .FirstOrDefaultAsync();
         }
 
         public async Task<List<ChatRoom>> GetByUserAsync(string userId)
         {
             if (_db.IsInMemory)
                 return _db.Rooms.Values
-                    .Where(r => r.MemberIds.Contains(userId))
+                    .Where(r => !r.IsDeleted && r.MemberIds.Contains(userId))
                     .OrderByDescending(r => r.LastMessageAt)
                     .ToList();
-            return await _col!.Find(r => r.MemberIds.Contains(userId))
-                .SortByDescending(r => r.LastMessageAt).ToListAsync();
+
+            return await _col!
+                .Find(r => !r.IsDeleted && r.MemberIds.Contains(userId))
+                .SortByDescending(r => r.LastMessageAt)
+                .ToListAsync();
         }
 
         public async Task<List<ChatRoom>> SearchAsync(RoomSearchQuery q)
         {
             q.Clamp();
             if (_db.IsInMemory)
-                return ApplyRoomFilter(_db.Rooms.Values, q)
+                return ApplyRoomFilter(_db.Rooms.Values.Where(r => !r.IsDeleted), q)
                     .Skip(q.Skip).Take(q.PageSize).ToList();
 
             var filter = BuildMongoRoomFilter(q);
@@ -110,7 +154,8 @@ namespace apiContact.Data.Repositories
         public async Task<int> CountSearchAsync(RoomSearchQuery q)
         {
             if (_db.IsInMemory)
-                return ApplyRoomFilter(_db.Rooms.Values, q).Count();
+                return ApplyRoomFilter(_db.Rooms.Values.Where(r => !r.IsDeleted), q).Count();
+
             return (int)await _col!.CountDocumentsAsync(BuildMongoRoomFilter(q));
         }
 
@@ -119,9 +164,12 @@ namespace apiContact.Data.Repositories
             var room = await GetByIdAsync(roomId);
             if (room is null || room.MemberIds.Contains(userId)) return false;
             room.MemberIds.Add(userId);
+            room.UpdatedAt = DateTime.UtcNow;
             if (_db.IsInMemory) { _db.Rooms[roomId] = room; return true; }
             await _col!.UpdateOneAsync(r => r.Id == roomId,
-                Builders<ChatRoom>.Update.AddToSet(r => r.MemberIds, userId));
+                Builders<ChatRoom>.Update
+                    .AddToSet(r => r.MemberIds, userId)
+                    .Set(r => r.UpdatedAt, room.UpdatedAt));
             return true;
         }
 
@@ -130,9 +178,12 @@ namespace apiContact.Data.Repositories
             var room = await GetByIdAsync(roomId);
             if (room is null) return false;
             room.MemberIds.Remove(userId);
+            room.UpdatedAt = DateTime.UtcNow;
             if (_db.IsInMemory) { _db.Rooms[roomId] = room; return true; }
             await _col!.UpdateOneAsync(r => r.Id == roomId,
-                Builders<ChatRoom>.Update.Pull(r => r.MemberIds, userId));
+                Builders<ChatRoom>.Update
+                    .Pull(r => r.MemberIds, userId)
+                    .Set(r => r.UpdatedAt, room.UpdatedAt));
             return true;
         }
 
@@ -142,18 +193,21 @@ namespace apiContact.Data.Repositories
             if (room is null) return;
             room.LastMessagePreview = preview;
             room.LastMessageAt      = DateTime.UtcNow;
+            room.UpdatedAt          = DateTime.UtcNow;
             if (_db.IsInMemory) { _db.Rooms[roomId] = room; return; }
             await _col!.UpdateOneAsync(r => r.Id == roomId,
                 Builders<ChatRoom>.Update
                     .Set(r => r.LastMessagePreview, preview)
-                    .Set(r => r.LastMessageAt,      DateTime.UtcNow));
+                    .Set(r => r.LastMessageAt,      room.LastMessageAt)
+                    .Set(r => r.UpdatedAt,          room.UpdatedAt));
         }
 
         public async Task<bool> SlugExistsAsync(string slug)
         {
             if (_db.IsInMemory)
-                return _db.Rooms.Values.Any(r => r.Slug == slug);
-            return await _col!.Find(r => r.Slug == slug).AnyAsync();
+                return _db.Rooms.Values.Any(r => !r.IsDeleted && r.Slug == slug);
+
+            return await _col!.Find(r => !r.IsDeleted && r.Slug == slug).AnyAsync();
         }
 
         public Task<List<string>> GetAllCategoriesAsync()
@@ -161,16 +215,17 @@ namespace apiContact.Data.Repositories
             if (_db.IsInMemory)
             {
                 var cats = _db.Rooms.Values
-                    .Where(r => !string.IsNullOrWhiteSpace(r.Category))
+                    .Where(r => !r.IsDeleted && !string.IsNullOrWhiteSpace(r.Category))
                     .Select(r => r.Category)
                     .Distinct(StringComparer.OrdinalIgnoreCase)
                     .OrderBy(c => c)
                     .ToList();
                 return Task.FromResult(cats);
             }
-            // MongoDB: use distinct
             return _col!.Distinct<string>("Category",
-                Builders<ChatRoom>.Filter.Ne(r => r.Category, string.Empty))
+                    Builders<ChatRoom>.Filter.And(
+                        Builders<ChatRoom>.Filter.Eq(r => r.IsDeleted, false),
+                        Builders<ChatRoom>.Filter.Ne(r => r.Category, string.Empty)))
                 .ToListAsync();
         }
 
@@ -179,6 +234,7 @@ namespace apiContact.Data.Repositories
             if (_db.IsInMemory)
             {
                 var tags = _db.Rooms.Values
+                    .Where(r => !r.IsDeleted)
                     .SelectMany(r => r.Tags)
                     .Where(t => !string.IsNullOrWhiteSpace(t))
                     .Distinct(StringComparer.OrdinalIgnoreCase)
@@ -187,7 +243,7 @@ namespace apiContact.Data.Repositories
                 return Task.FromResult(tags);
             }
             return _col!.Distinct<string>("Tags",
-                Builders<ChatRoom>.Filter.Empty)
+                    Builders<ChatRoom>.Filter.Eq(r => r.IsDeleted, false))
                 .ToListAsync();
         }
 
@@ -198,6 +254,7 @@ namespace apiContact.Data.Repositories
         }
 
         // ── Helpers ──────────────────────────────────────────────
+
         private static IEnumerable<ChatRoom> ApplyRoomFilter(
             IEnumerable<ChatRoom> src, RoomSearchQuery q)
         {
@@ -234,29 +291,32 @@ namespace apiContact.Data.Repositories
 
         private static FilterDefinition<ChatRoom> BuildMongoRoomFilter(RoomSearchQuery q)
         {
-            var builder = Builders<ChatRoom>.Filter;
-            var filters = new List<FilterDefinition<ChatRoom>>();
+            var b       = Builders<ChatRoom>.Filter;
+            var filters = new List<FilterDefinition<ChatRoom>>
+            {
+                b.Eq(r => r.IsDeleted, false)
+            };
 
             if (!q.IncludeArchived)
-                filters.Add(builder.Eq(r => r.IsArchived, false));
+                filters.Add(b.Eq(r => r.IsArchived, false));
 
             if (!string.IsNullOrWhiteSpace(q.Q))
-                filters.Add(builder.Or(
-                    builder.Regex(r => r.Name,        new MongoDB.Bson.BsonRegularExpression(q.Q, "i")),
-                    builder.Regex(r => r.Description, new MongoDB.Bson.BsonRegularExpression(q.Q, "i")),
-                    builder.AnyEq(r => r.Tags,        q.Q)));
+                filters.Add(b.Or(
+                    b.Regex(r => r.Name,        new MongoDB.Bson.BsonRegularExpression(q.Q, "i")),
+                    b.Regex(r => r.Description, new MongoDB.Bson.BsonRegularExpression(q.Q, "i")),
+                    b.AnyEq(r => r.Tags,        q.Q)));
 
             if (!string.IsNullOrWhiteSpace(q.Category))
-                filters.Add(builder.Regex(r => r.Category,
+                filters.Add(b.Regex(r => r.Category,
                     new MongoDB.Bson.BsonRegularExpression($"^{q.Category}$", "i")));
 
             if (!string.IsNullOrWhiteSpace(q.Tag))
-                filters.Add(builder.AnyEq(r => r.Tags, q.Tag));
+                filters.Add(b.AnyEq(r => r.Tags, q.Tag));
 
             if (q.Type.HasValue)
-                filters.Add(builder.Eq(r => r.Type, q.Type.Value));
+                filters.Add(b.Eq(r => r.Type, q.Type.Value));
 
-            return filters.Count > 0 ? builder.And(filters) : builder.Empty;
+            return b.And(filters);
         }
 
         private static SortDefinition<ChatRoom> BuildMongoRoomSort(RoomSearchQuery q) =>

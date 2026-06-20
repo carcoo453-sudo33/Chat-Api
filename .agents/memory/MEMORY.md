@@ -1,3 +1,5 @@
 - [Chat API architecture](chat-api-arch.md) — Repository+UoW+MediatR CQRS stack; enums in Models/Enums; Controllers → IMediator → Handlers → IUnitOfWork → Repositories → ChatDbContext
-- [Frontend icon strategy](frontend-icons.md) — Lucide CDN for static icons; inline SVG ICONS map in main.js for dynamic ones; theme switching via CSS [data-theme] selectors only
+- [Mappings layer](mappings-layer.md) — Mappings/ folder owns all entity↔DTO logic; UserMapper, RoomMapper, MessageMapper; typed response records (UserProfileDto, UserPublicProfileDto); no anonymous objects in controllers/handlers
 - [SortDirection naming conflict](sort-direction-conflict.md) — Custom enum named SortDirection conflicts with MongoDB.Driver.SortDirection; renamed to SortOrder to avoid CS0104 ambiguity
+- [MongoDB double-sort bug](mongodb-double-sort.md) — Chaining two SortBy/SortByDescending calls replaces the first; fix by fetching with the primary sort then re-sorting the page in memory
+- [Soft-delete pattern](soft-delete-pattern.md) — All entities use BaseEntity.SoftDelete(); User/Room repos use soft-delete in DeleteAsync; always filter !IsDeleted in GetAll/Search/GetById; messages show "[Message deleted]" instead of being removed

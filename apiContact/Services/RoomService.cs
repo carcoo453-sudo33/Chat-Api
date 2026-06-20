@@ -1,8 +1,8 @@
 using apiContact.Data.Repositories;
+using apiContact.Mappings;
 using apiContact.Models.Dtos;
 using apiContact.Models.Entities;
 using apiContact.Utilities;
-using MongoDB.Bson;
 
 namespace apiContact.Services
 {
@@ -15,28 +15,10 @@ namespace apiContact.Services
         public Task<List<ChatRoom>> GetByUserAsync(string userId)        => _uow.Rooms.GetByUserAsync(userId);
         public Task<ChatRoom?> GetByIdAsync(string id)                   => _uow.Rooms.GetByIdAsync(id);
 
-        public async Task<ChatRoom> CreateAsync(CreateRoomDto dto)
+        public async Task<ChatRoom> CreateAsync(CreateRoomDto dto, string callerId)
         {
-            if (!dto.MemberIds.Contains(dto.CreatedBy))
-                dto.MemberIds.Add(dto.CreatedBy);
-
-            var allSlugs = (await _uow.Rooms.GetAllAsync()).Select(r => r.Slug);
-            var slug     = SlugHelper.Uniquify(SlugHelper.Generate(dto.Name), allSlugs);
-
-            var room = new ChatRoom
-            {
-                Id          = ObjectId.GenerateNewId().ToString(),
-                Name        = dto.Name,
-                Slug        = slug,
-                Description = dto.Description,
-                Category    = dto.Category,
-                Tags        = dto.Tags,
-                Type        = dto.Type,
-                IsPrivate   = dto.IsPrivate,
-                MemberIds   = dto.MemberIds,
-                CreatedBy   = dto.CreatedBy,
-                CreatedAt   = DateTime.UtcNow
-            };
+            var slug = await ResolveUniqueSlugAsync(SlugHelper.Generate(dto.Name));
+            var room = RoomMapper.FromCreateDto(dto, callerId, slug);
             return await _uow.Rooms.AddAsync(room);
         }
 
@@ -44,5 +26,17 @@ namespace apiContact.Services
         public Task<bool> RemoveMemberAsync(string roomId, string userId) => _uow.Rooms.RemoveMemberAsync(roomId, userId);
         public Task<bool> DeleteAsync(string id)                          => _uow.Rooms.DeleteAsync(id);
         public Task UpdateLastMessageAsync(string roomId, string preview) => _uow.Rooms.UpdateLastMessageAsync(roomId, preview);
+
+        private async Task<string> ResolveUniqueSlugAsync(string baseSlug)
+        {
+            var slug = baseSlug;
+            if (!await _uow.Rooms.SlugExistsAsync(slug)) return slug;
+
+            int counter = 2;
+            do { slug = $"{baseSlug}-{counter++}"; }
+            while (await _uow.Rooms.SlugExistsAsync(slug));
+
+            return slug;
+        }
     }
 }

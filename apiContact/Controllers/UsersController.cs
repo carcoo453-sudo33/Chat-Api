@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using apiContact.Features.Users;
+using apiContact.Mappings;
 using apiContact.Models.Dtos;
 using apiContact.Models.Enums;
 using MediatR;
@@ -29,7 +30,7 @@ namespace apiContact.Controllers
         public async Task<IActionResult> GetAll()
         {
             var list     = await _mediator.Send(new GetAllUsersQuery());
-            var profiles = list.Select(MapProfile);
+            var profiles = list.Select(UserMapper.ToProfile);
             return Ok(ApiResponse<object>.Ok(profiles, total: list.Count));
         }
 
@@ -46,7 +47,7 @@ namespace apiContact.Controllers
         public async Task<IActionResult> GetOnline()
         {
             var list     = await _mediator.Send(new GetOnlineUsersQuery());
-            var profiles = list.Select(MapPublicProfile);
+            var profiles = list.Select(UserMapper.ToPublicProfile);
             return Ok(ApiResponse<object>.Ok(profiles, total: list.Count));
         }
 
@@ -58,7 +59,7 @@ namespace apiContact.Controllers
         {
             var user = await _mediator.Send(new GetUserByIdQuery(id));
             if (user is null) return NotFound(ApiResponse<object>.Fail("User not found"));
-            return Ok(ApiResponse<object>.Ok(MapProfile(user)));
+            return Ok(ApiResponse<object>.Ok(UserMapper.ToProfile(user)));
         }
 
         // ── Mutations ─────────────────────────────────────────────
@@ -71,13 +72,7 @@ namespace apiContact.Controllers
                 return Forbid();
             var user = await _mediator.Send(new UpdateUserCommand(id, dto));
             if (user is null) return NotFound(ApiResponse<object>.Fail("User not found"));
-            return Ok(ApiResponse<object>.Ok(new
-            {
-                user.Id, user.Username, user.DisplayName,
-                user.AvatarUrl,
-                Status = user.Status.ToString(),
-                user.IsOnline
-            }, "Profile updated"));
+            return Ok(ApiResponse<object>.Ok(UserMapper.ToProfile(user), "Profile updated"));
         }
 
         /// <summary>Set full presence status (Online, Away, Busy, Offline)</summary>
@@ -100,22 +95,5 @@ namespace apiContact.Controllers
             if (!ok) return NotFound(ApiResponse<object>.Fail("User not found"));
             return Ok(ApiResponse<object>.Ok(new { id }, "User deleted"));
         }
-
-        // ── Helpers ───────────────────────────────────────────────
-        private static object MapProfile(Models.Entities.ChatUser u) => new
-        {
-            u.Id, u.Username, u.DisplayName,
-            u.Email, u.AvatarUrl, u.Role,
-            Status = u.Status.ToString(),
-            u.IsOnline, u.LastSeen, u.CreatedAt
-        };
-
-        private static object MapPublicProfile(Models.Entities.ChatUser u) => new
-        {
-            u.Id, u.Username, u.DisplayName,
-            u.AvatarUrl, u.Role,
-            Status = u.Status.ToString(),
-            u.IsOnline
-        };
     }
 }

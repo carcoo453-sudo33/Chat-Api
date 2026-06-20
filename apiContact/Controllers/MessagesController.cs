@@ -25,7 +25,7 @@ namespace apiContact.Controllers
 
         // ── History ───────────────────────────────────────────────
 
-        /// <summary>Get paginated message history for a room (newest-first window, re-ordered asc)</summary>
+        /// <summary>Get paginated message history for a room (newest-first window, re-ordered asc for display)</summary>
         [HttpGet("room/{roomId}")]
         public async Task<IActionResult> GetByRoom(
             string roomId,
@@ -67,9 +67,6 @@ namespace apiContact.Controllers
         [HttpPost]
         public async Task<IActionResult> Send([FromBody] SendMessageDto dto)
         {
-            if (string.IsNullOrWhiteSpace(dto.Content))
-                return BadRequest(ApiResponse<object>.Fail("Message content is required"));
-
             dto.SenderId = CallerId;
             var msg = await _mediator.Send(new SendMessageCommand(dto, CallerName));
             return CreatedAtAction(nameof(GetById), new { id = msg.Id },
@@ -85,6 +82,7 @@ namespace apiContact.Controllers
             if (existing.SenderId != CallerId) return Forbid();
 
             var updated = await _mediator.Send(new EditMessageCommand(id, CallerId, dto.Content));
+            if (updated is null) return NotFound(ApiResponse<object>.Fail("Message not found"));
             return Ok(ApiResponse<object>.Ok(updated, "Message edited"));
         }
 

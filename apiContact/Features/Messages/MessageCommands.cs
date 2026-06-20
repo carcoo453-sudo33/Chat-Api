@@ -1,10 +1,10 @@
 using apiContact.Data.Repositories;
 using apiContact.Hubs;
+using apiContact.Mappings;
 using apiContact.Models.Dtos;
 using apiContact.Models.Entities;
 using MediatR;
 using Microsoft.AspNetCore.SignalR;
-using MongoDB.Bson;
 
 namespace apiContact.Features.Messages
 {
@@ -25,27 +25,14 @@ namespace apiContact.Features.Messages
 
         public async Task<Message> Handle(SendMessageCommand cmd, CancellationToken ct)
         {
-            var dto = cmd.Dto;
-            var msg = new Message
-            {
-                Id         = ObjectId.GenerateNewId().ToString(),
-                RoomId     = dto.RoomId,
-                SenderId   = dto.SenderId,
-                SenderName = cmd.SenderName,
-                Content    = dto.Content,
-                Type       = dto.Type,
-                Tags       = dto.Tags,
-                Timestamp  = DateTime.UtcNow
-            };
+            var msg = MessageMapper.FromSendDto(cmd.Dto, cmd.SenderName);
             await _uow.Messages.AddAsync(msg);
 
-            // Update room last-message preview
-            var preview = dto.Content.Length > 60
-                ? dto.Content[..60] + "…" : dto.Content;
-            await _uow.Rooms.UpdateLastMessageAsync(dto.RoomId, preview);
+            var preview = msg.Content.Length > 60
+                ? msg.Content[..60] + "…" : msg.Content;
+            await _uow.Rooms.UpdateLastMessageAsync(msg.RoomId, preview);
 
-            // Broadcast via SignalR
-            await _hub.Clients.Group(dto.RoomId).SendAsync("ReceiveMessage", new
+            await _hub.Clients.Group(msg.RoomId).SendAsync("ReceiveMessage", new
             {
                 msg.Id, msg.RoomId, msg.SenderId, msg.SenderName,
                 msg.Content, Type = msg.Type.ToString(),

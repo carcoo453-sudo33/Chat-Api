@@ -1,9 +1,9 @@
 using apiContact.Data.Repositories;
+using apiContact.Mappings;
 using apiContact.Models.Dtos;
 using apiContact.Models.Entities;
 using apiContact.Utilities;
 using MediatR;
-using MongoDB.Bson;
 
 namespace apiContact.Features.Rooms
 {
@@ -17,36 +17,25 @@ namespace apiContact.Features.Rooms
 
         public async Task<ChatRoom> Handle(CreateRoomCommand cmd, CancellationToken ct)
         {
-            var dto = cmd.Dto;
-            dto.CreatedBy = cmd.CallerId;
-            if (!dto.MemberIds.Contains(cmd.CallerId))
-                dto.MemberIds.Add(cmd.CallerId);
-
-            // Efficient slug uniquification — uses SlugExistsAsync (single DB call per attempt)
-            var baseSlug = SlugHelper.Generate(dto.Name);
-            var slug     = baseSlug;
-            if (await _uow.Rooms.SlugExistsAsync(slug))
-            {
-                int counter = 2;
-                do { slug = $"{baseSlug}-{counter++}"; }
-                while (await _uow.Rooms.SlugExistsAsync(slug));
-            }
-
-            var room = new ChatRoom
-            {
-                Id          = ObjectId.GenerateNewId().ToString(),
-                Name        = dto.Name,
-                Slug        = slug,
-                Description = dto.Description,
-                Category    = dto.Category,
-                Tags        = dto.Tags,
-                Type        = dto.Type,
-                IsPrivate   = dto.IsPrivate,
-                MemberIds   = dto.MemberIds,
-                CreatedBy   = dto.CreatedBy,
-                CreatedAt   = DateTime.UtcNow
-            };
+            var slug = await ResolveUniqueSlugAsync(SlugHelper.Generate(cmd.Dto.Name));
+            var room = RoomMapper.FromCreateDto(cmd.Dto, cmd.CallerId, slug);
             return await _uow.Rooms.AddAsync(room);
+        }
+
+        /// <summary>
+        /// Generates a slug from the base, appending an incrementing suffix until it is unique.
+        /// Uses a single DB call per attempt — no full-table load.
+        /// </summary>
+        private async Task<string> ResolveUniqueSlugAsync(string baseSlug)
+        {
+            var slug = baseSlug;
+            if (!await _uow.Rooms.SlugExistsAsync(slug)) return slug;
+
+            int counter = 2;
+            do { slug = $"{baseSlug}-{counter++}"; }
+            while (await _uow.Rooms.SlugExistsAsync(slug));
+
+            return slug;
         }
     }
 
@@ -62,29 +51,21 @@ namespace apiContact.Features.Rooms
         {
             var room = await _uow.Rooms.GetByIdAsync(cmd.Id);
             if (room is null) return null;
-            var dto = cmd.Dto;
 
-            if (dto.Name is not null)
+            string? newSlug = null;
+            if (cmd.Dto.Name is not null)
             {
-                room.Name = dto.Name;
-                // Regenerate slug only when name changes; ensure uniqueness
-                var baseSlug = SlugHelper.Generate(dto.Name);
-                var slug     = baseSlug;
-                if (slug != room.Slug && await _uow.Rooms.SlugExistsAsync(slug))
+                var baseSlug = SlugHelper.Generate(cmd.Dto.Name);
+                newSlug = baseSlug;
+                if (newSlug != room.Slug && await _uow.Rooms.SlugExistsAsync(newSlug))
                 {
                     int counter = 2;
-                    do { slug = $"{baseSlug}-{counter++}"; }
-                    while (await _uow.Rooms.SlugExistsAsync(slug));
+                    do { newSlug = $"{baseSlug}-{counter++}"; }
+                    while (await _uow.Rooms.SlugExistsAsync(newSlug));
                 }
-                room.Slug = slug;
             }
 
-            if (dto.Description is not null) room.Description = dto.Description;
-            if (dto.Category    is not null) room.Category    = dto.Category;
-            if (dto.Tags        is not null) room.Tags        = dto.Tags;
-            if (dto.IsArchived.HasValue)     room.IsArchived  = dto.IsArchived.Value;
-            if (dto.IsPrivate.HasValue)      room.IsPrivate   = dto.IsPrivate.Value;
-
+            RoomMapper.ApplyUpdate(room, cmd.Dto, newSlug);
             return await _uow.Rooms.UpdateAsync(room);
         }
     }
@@ -102,6 +83,7 @@ namespace apiContact.Features.Rooms
             var room = await _uow.Rooms.GetByIdAsync(cmd.Id);
             if (room is null) return null;
             room.IsArchived = cmd.Archive;
+            room.UpdatedAt  = DateTime.UtcNow;
             return await _uow.Rooms.UpdateAsync(room);
         }
     }

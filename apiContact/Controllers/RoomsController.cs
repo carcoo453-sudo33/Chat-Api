@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using apiContact.Features.Rooms;
 using apiContact.Features.Users;
+using apiContact.Mappings;
 using apiContact.Models.Dtos;
 using apiContact.Models.Enums;
 using MediatR;
@@ -109,14 +110,8 @@ namespace apiContact.Controllers
         {
             var room = await _mediator.Send(new GetRoomByIdQuery(id));
             if (room is null) return NotFound(ApiResponse<object>.Fail("Room not found"));
-            var users = await _mediator.Send(new GetUsersByRoomQuery(id));
-            var profiles = users.Select(u => new
-            {
-                u.Id, u.Username, u.DisplayName,
-                u.AvatarUrl, u.Role,
-                Status = u.Status.ToString(),
-                u.IsOnline
-            });
+            var users    = await _mediator.Send(new GetUsersByRoomQuery(id));
+            var profiles = users.Select(UserMapper.ToPublicProfile);
             return Ok(ApiResponse<object>.Ok(profiles, total: users.Count));
         }
 
@@ -126,8 +121,6 @@ namespace apiContact.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateRoomDto dto)
         {
-            if (string.IsNullOrWhiteSpace(dto.Name))
-                return BadRequest(ApiResponse<object>.Fail("Room name is required"));
             var room = await _mediator.Send(new CreateRoomCommand(dto, CallerId));
             return CreatedAtAction(nameof(GetById), new { id = room.Id },
                 ApiResponse<object>.Ok(room, "Room created"));
@@ -142,7 +135,7 @@ namespace apiContact.Controllers
             return Ok(ApiResponse<object>.Ok(room, "Room updated"));
         }
 
-        /// <summary>Archive or unarchive a room (admin or creator)</summary>
+        /// <summary>Archive a room (admin or creator)</summary>
         [HttpPost("{id}/archive")]
         public async Task<IActionResult> Archive(string id)
         {
