@@ -20,14 +20,12 @@
 
 <!-- PAGE LOADER -->
 <div id="page-loader" aria-hidden="true">
-  <div class="pl-logo">
-    <div class="pl-dot"></div>
-    Chat API
-    <div class="pl-ring"></div>
-  </div>
+  <div class="pl-logo"><div class="pl-dot"></div>Chat API<div class="pl-ring"></div></div>
 </div>
 
-<!-- NAV -->
+<!-- ═══════════════════════════════════════════════════════
+     MAIN NAV — brand left · links center · icons right
+     ═══════════════════════════════════════════════════════ -->
 <nav>
   <a class="nav-logo" href="/"><div class="dot"></div>Chat API</a>
   <div class="nav-links">
@@ -54,487 +52,1059 @@
   <a href="/docs.html" class="active"><i data-lucide="book-open" class="icon-md"></i> Docs</a>
   <a href="/swagger"><i data-lucide="zap" class="icon-md"></i> Swagger UI</a>
   <a href="/health"><i data-lucide="activity" class="icon-md"></i> Health</a>
-  <div class="mobile-menu-sep"></div>
-  <a href="#overview">Overview</a>
-  <a href="#authentication">Authentication</a>
-  <a href="#auth-register">Auth</a>
-  <a href="#users-list">Users</a>
-  <a href="#rooms-list">Rooms</a>
-  <a href="#msg-history">Messages</a>
-  <a href="#files-upload">Files</a>
-  <a href="#audit-recent">Audit</a>
-  <a href="#ws-connect">WebSocket</a>
 </div>
 
-<!-- SIDEBAR TOGGLE -->
-<button class="sidebar-toggle" id="sidebar-toggle" title="Toggle sidebar">
-  <span class="st-hide"><i data-lucide="chevron-left" class="icon-md"></i></span>
-  <span class="st-show"><i data-lucide="chevron-right" class="icon-md"></i></span>
-  <span class="st-mobile"><i data-lucide="menu" class="icon-md"></i></span>
-</button>
-
-<!-- DOCS LAYOUT -->
-<div class="docs-layout" id="docs-layout">
-
-  <!-- SIDEBAR -->
-  <aside class="docs-sidebar" id="docs-sidebar">
-    <h4>Pages</h4>
-    <a href="/"><i data-lucide="home" class="icon-sm"></i> Home</a>
-    <a href="/swagger"><i data-lucide="zap" class="icon-sm"></i> Swagger UI</a>
-    <a href="/health"><i data-lucide="activity" class="icon-sm"></i> Health</a>
-
-    <h4>Getting Started</h4>
-    <a href="#overview">Overview</a>
-    <a href="#base-url">Base URL</a>
-    <a href="#authentication">Authentication</a>
-    <a href="#response-format">Response Format</a>
-    <a href="#errors">Error Handling</a>
-
-    <h4>Auth</h4>
-    <a href="#auth-register">Register</a>
-    <a href="#auth-login">Login</a>
-    <a href="#auth-refresh">Refresh Token</a>
-    <a href="#auth-me">Get Me</a>
-    <a href="#auth-logout">Logout</a>
-    <a href="#auth-password">Change Password</a>
-
-    <h4>Users</h4>
-    <a href="#users-list">List Users</a>
-    <a href="#users-get">Get User</a>
-    <a href="#users-create">Create User</a>
-    <a href="#users-update">Update User</a>
-    <a href="#users-status">Set Status</a>
-    <a href="#users-delete">Delete User</a>
-
-    <h4>Rooms</h4>
-    <a href="#rooms-list">List Rooms</a>
-    <a href="#rooms-by-user">By User</a>
-    <a href="#rooms-get">Get Room</a>
-    <a href="#rooms-create">Create Room</a>
-    <a href="#rooms-members">Add Member</a>
-    <a href="#rooms-remove">Remove Member</a>
-
-    <h4>Messages</h4>
-    <a href="#msg-history">Message History</a>
-    <a href="#msg-send">Send Message</a>
-    <a href="#msg-edit">Edit Message</a>
-    <a href="#msg-delete">Delete Message</a>
-    <a href="#msg-read">Mark Read</a>
-    <a href="#msg-unread">Unread Count</a>
-
-    <h4>Files</h4>
-    <a href="#files-upload">Upload File</a>
-    <a href="#files-delete">Delete File</a>
-
-    <h4>Audit</h4>
-    <a href="#audit-recent">Recent Events</a>
-    <a href="#audit-search">Search</a>
-    <a href="#audit-by-user">By User</a>
-    <a href="#audit-by-action">By Action</a>
-
-    <h4>WebSocket</h4>
-    <a href="#ws-connect">Connect</a>
-    <a href="#ws-events">Events Reference</a>
-    <a href="#ws-example">JS Example</a>
-  </aside>
-
-  <!-- MAIN -->
-  <main class="docs-main">
-    <div class="hero-tag" style="margin-bottom:.85rem">API Reference v1</div>
+<!-- ═══════════════════════════════════════════════════════
+     DOCS INTRO (always visible)
+     ═══════════════════════════════════════════════════════ -->
+<div class="docs-intro">
+  <div class="docs-intro-inner">
+    <div class="hero-tag"><i data-lucide="book-open" class="icon-sm"></i> API Reference v1</div>
     <h1>Chat API Documentation</h1>
-    <p>A realtime chat backend with REST endpoints and WebSocket (SignalR) events. All responses follow a standard envelope format. All entity IDs are GUIDs.</p>
-
-    <!-- OVERVIEW -->
-    <h2 id="overview">Overview</h2>
-    <div class="grid-4" style="margin-bottom:1.35rem;">
-      <div class="card mini-card">
-        <div class="card-icon ci-purple"><i data-lucide="lock" class="icon-lg"></i></div>
-        <h3 style="font-size:.82rem">Auth</h3>
-        <p style="font-size:.76rem">JWT + refresh</p>
-      </div>
-      <div class="card mini-card">
-        <div class="card-icon ci-orange"><i data-lucide="user" class="icon-lg"></i></div>
-        <h3 style="font-size:.82rem">Users</h3>
-        <p style="font-size:.76rem">Profiles, presence</p>
-      </div>
-      <div class="card mini-card">
-        <div class="card-icon ci-green"><i data-lucide="message-square" class="icon-lg"></i></div>
-        <h3 style="font-size:.82rem">Rooms</h3>
-        <p style="font-size:.76rem">Groups, channels</p>
-      </div>
-      <div class="card mini-card">
-        <div class="card-icon ci-amber"><i data-lucide="mail" class="icon-lg"></i></div>
-        <h3 style="font-size:.82rem">Messages</h3>
-        <p style="font-size:.76rem">Send, edit, delete</p>
-      </div>
-      <div class="card mini-card">
-        <div class="card-icon ci-orange"><i data-lucide="upload" class="icon-lg"></i></div>
-        <h3 style="font-size:.82rem">Files</h3>
-        <p style="font-size:.76rem">Blob storage</p>
-      </div>
-      <div class="card mini-card">
-        <div class="card-icon ci-red"><i data-lucide="scroll-text" class="icon-lg"></i></div>
-        <h3 style="font-size:.82rem">Audit</h3>
-        <p style="font-size:.76rem">Event log</p>
-      </div>
-      <div class="card mini-card">
-        <div class="card-icon ci-green"><i data-lucide="zap" class="icon-lg"></i></div>
-        <h3 style="font-size:.82rem">WebSocket</h3>
-        <p style="font-size:.76rem">SignalR realtime</p>
-      </div>
-      <div class="card mini-card">
-        <div class="card-icon ci-amber"><i data-lucide="shield" class="icon-lg"></i></div>
-        <h3 style="font-size:.82rem">Security</h3>
-        <p style="font-size:.76rem">Hardened API</p>
-      </div>
+    <p>REST + WebSocket (SignalR) backend. All responses use a standard envelope. All IDs are GUIDs. JWT required on protected routes.</p>
+    <div class="docs-meta">
+      <span class="docs-meta-item"><i data-lucide="link" class="icon-sm"></i> Base: <code>http://localhost:5000</code></span>
+      <span class="docs-meta-item"><i data-lucide="lock" class="icon-sm"></i> Auth: <code>Authorization: Bearer &lt;token&gt;</code></span>
+      <span class="docs-meta-item"><i data-lucide="zap" class="icon-sm"></i> WS Hub: <code>/hubs/chat</code></span>
+      <span class="docs-meta-item"><i data-lucide="shield" class="icon-sm"></i> Rate limit: <code>10/min auth · 120/min global</code></span>
     </div>
+  </div>
+</div>
 
-    <h2 id="base-url">Base URL</h2>
-    <div class="code-block">http://localhost:5000</div>
-    <p>All API routes are prefixed with <code>/api</code>. WebSocket hub is at <code>/hubs/chat</code>.</p>
+<!-- ═══════════════════════════════════════════════════════
+     STICKY TAB NAV
+     ═══════════════════════════════════════════════════════ -->
+<div class="docs-tabnav" id="docs-tabnav" role="tablist" aria-label="API sections">
+  <div class="docs-tabnav-inner">
+    <button class="dtab active" data-tab="auth" role="tab" aria-selected="true">
+      <i data-lucide="key-round" class="icon-sm"></i> Auth
+    </button>
+    <button class="dtab" data-tab="users" role="tab" aria-selected="false">
+      <i data-lucide="users" class="icon-sm"></i> Users
+    </button>
+    <button class="dtab" data-tab="rooms" role="tab" aria-selected="false">
+      <i data-lucide="message-square" class="icon-sm"></i> Rooms
+    </button>
+    <button class="dtab" data-tab="messages" role="tab" aria-selected="false">
+      <i data-lucide="mail" class="icon-sm"></i> Messages
+    </button>
+    <button class="dtab" data-tab="files" role="tab" aria-selected="false">
+      <i data-lucide="upload" class="icon-sm"></i> Files
+    </button>
+    <button class="dtab" data-tab="audit" role="tab" aria-selected="false">
+      <i data-lucide="scroll-text" class="icon-sm"></i> Audit
+    </button>
+    <button class="dtab" data-tab="websocket" role="tab" aria-selected="false">
+      <i data-lucide="zap" class="icon-sm"></i> WebSocket
+    </button>
+  </div>
+</div>
 
-    <!-- AUTHENTICATION -->
-    <h2 id="authentication">Authentication</h2>
-    <p>Most endpoints require a JWT Bearer token obtained from <code>POST /api/auth/login</code>.</p>
-    <div class="info-box">
-      <i data-lucide="info" class="icon-sm box-icon"></i>
-      <div class="box-body">
-        <strong>How to authenticate:</strong><br/>
-        Include the header <code>Authorization: Bearer &lt;accessToken&gt;</code> on every protected request.<br/>
-        Access tokens expire in 60 minutes. Use <code>POST /api/auth/refresh</code> to get a new one silently.
+<!-- ═══════════════════════════════════════════════════════
+     TAB CONTENT
+     ═══════════════════════════════════════════════════════ -->
+<div class="docs-content">
+
+  <!-- ─────────────────────────────────────────────────────
+       AUTH TAB
+       ───────────────────────────────────────────────────── -->
+  <div class="tab-panel active" id="tab-auth" role="tabpanel">
+    <div class="panel-header">
+      <div class="panel-header-icon ci-purple"><i data-lucide="key-round" class="icon-lg"></i></div>
+      <div class="panel-header-text">
+        <h2>Authentication</h2>
+        <p>JWT access tokens · refresh token rotation · BCrypt hashing · rate limited to 10 req/min</p>
       </div>
     </div>
     <div class="warn-box">
       <i data-lucide="alert-triangle" class="icon-sm box-icon"></i>
       <div class="box-body">
-        <strong>Demo credentials (in-memory seed):</strong><br/>
+        <strong>Demo seed credentials:</strong>
         <code>alice / password123</code> (admin) &nbsp;·&nbsp; <code>bob / password123</code> &nbsp;·&nbsp; <code>carla / password123</code>
       </div>
     </div>
-    <div class="warn-box">
-      <i data-lucide="shield" class="icon-sm box-icon"></i>
-      <div class="box-body">
-        <strong>Rate limiting:</strong> Auth endpoints are limited to <strong>10 requests/min</strong> per IP.
-        File upload is limited to <strong>20 requests/min</strong>. Global limit is <strong>120 requests/min</strong>.
-      </div>
-    </div>
+    <div class="ep-list">
 
-    <!-- RESPONSE FORMAT -->
-    <h2 id="response-format">Response Format</h2>
-    <p>Every REST response uses a standard envelope:</p>
-    <div class="code-block" id="resp-fmt" style="position:relative;">
-      <button class="copy-btn">Copy</button>
-{
-  <span class="key">"success"</span>: <span class="num">true</span>,
-  <span class="key">"message"</span>: <span class="str">"Success"</span>,
-  <span class="key">"data"</span>:    <span class="comment">{ ... } or [ ... ]</span>,
-  <span class="key">"total"</span>:   <span class="num">42</span>  <span class="comment">// only on list responses</span>
-}
-    </div>
-
-    <!-- ERRORS -->
-    <h2 id="errors">Error Handling</h2>
-    <div class="param-table-wrap">
-      <table class="param-table">
-        <thead><tr><th>Status</th><th>Meaning</th></tr></thead>
-        <tbody>
-          <tr><td><span class="badge badge-green">200</span></td><td>OK — success</td></tr>
-          <tr><td><span class="badge badge-green">201</span></td><td>Created — resource created</td></tr>
-          <tr><td><span class="badge badge-orange">400</span></td><td>Bad Request — validation failed</td></tr>
-          <tr><td><span class="badge badge-orange">401</span></td><td>Unauthorized — missing or invalid JWT</td></tr>
-          <tr><td><span class="badge badge-orange">403</span></td><td>Forbidden — insufficient role</td></tr>
-          <tr><td><span class="badge badge-orange">404</span></td><td>Not Found — resource missing</td></tr>
-          <tr><td><span class="badge badge-purple">409</span></td><td>Conflict — duplicate resource</td></tr>
-          <tr><td><span class="badge badge-orange">429</span></td><td>Too Many Requests — rate limit exceeded</td></tr>
-          <tr><td><span class="badge badge-red">500</span></td><td>Server Error — unexpected failure (safe message only)</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- ═══ AUTH ═══ -->
-    <h2 id="auth-register">POST /api/auth/register</h2>
-    <p>Create a new account. Returns JWT access + refresh tokens immediately.</p>
-    <div class="code-block" style="position:relative;"><button class="copy-btn">Copy</button>
+      <div class="ep-item">
+        <button class="ep-toggle">
+          <span class="method method-post">POST</span>
+          <div class="ep-path-wrap">
+            <span class="ep-path">/api/auth/register</span>
+            <span class="ep-summary">Create a new account</span>
+          </div>
+          <div class="ep-badges"><span class="badge badge-green">public</span></div>
+          <i data-lucide="chevron-down" class="ep-chevron icon-sm"></i>
+        </button>
+        <div class="ep-body">
+          <p>Register a new user. Returns a JWT access token and refresh token immediately.</p>
+          <h4>Request body</h4>
+          <div class="code-block" style="position:relative"><button class="copy-btn">Copy</button>
 {
   <span class="key">"username"</span>:    <span class="str">"john_doe"</span>,
   <span class="key">"email"</span>:       <span class="str">"john@example.com"</span>,
   <span class="key">"password"</span>:    <span class="str">"secretpass123"</span>,
   <span class="key">"displayName"</span>: <span class="str">"John Doe"</span>
-}
-    </div>
+}</div>
+          <h4>Validation</h4>
+          <div class="param-table-wrap"><table class="param-table">
+            <thead><tr><th>Field</th><th>Rule</th></tr></thead>
+            <tbody>
+              <tr><td class="param-name">username</td><td>3–32 chars, letters/digits/_ - .</td></tr>
+              <tr><td class="param-name">email</td><td>valid email, max 254 chars</td></tr>
+              <tr><td class="param-name">password</td><td>8–128 chars</td></tr>
+              <tr><td class="param-name">displayName</td><td>optional, max 64 chars</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+      </div>
 
-    <h2 id="auth-login">POST /api/auth/login</h2>
-    <p>Login with username or email and password. Returns access + refresh token pair.</p>
-    <div class="code-block" style="position:relative;"><button class="copy-btn">Copy</button>
-{ <span class="key">"username"</span>: <span class="str">"alice"</span>, <span class="key">"password"</span>: <span class="str">"password123"</span> }
-    </div>
-    <div class="response-block">
-      <div class="response-label">Response 200</div>
-      <div class="code-block">
-{ <span class="key">"success"</span>: <span class="num">true</span>, <span class="key">"data"</span>: { <span class="key">"accessToken"</span>: <span class="str">"eyJ..."</span>, <span class="key">"refreshToken"</span>: <span class="str">"abc123"</span>, <span class="key">"expiresIn"</span>: <span class="num">3600</span> } }
+      <div class="ep-item">
+        <button class="ep-toggle">
+          <span class="method method-post">POST</span>
+          <div class="ep-path-wrap">
+            <span class="ep-path">/api/auth/login</span>
+            <span class="ep-summary">Sign in and get tokens</span>
+          </div>
+          <div class="ep-badges"><span class="badge badge-green">public</span></div>
+          <i data-lucide="chevron-down" class="ep-chevron icon-sm"></i>
+        </button>
+        <div class="ep-body">
+          <p>Login with username or email and password. Returns access + refresh token pair.</p>
+          <div class="code-block" style="position:relative"><button class="copy-btn">Copy</button>
+{ <span class="key">"usernameOrEmail"</span>: <span class="str">"alice"</span>, <span class="key">"password"</span>: <span class="str">"password123"</span> }</div>
+          <div class="response-block">
+            <div class="response-label">Response 200</div>
+            <div class="code-block">{ <span class="key">"success"</span>: <span class="num">true</span>, <span class="key">"data"</span>: { <span class="key">"accessToken"</span>: <span class="str">"eyJ..."</span>, <span class="key">"refreshToken"</span>: <span class="str">"abc..."</span>, <span class="key">"expiresAt"</span>: <span class="str">"2025-01-01T13:00Z"</span> } }</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ep-item">
+        <button class="ep-toggle">
+          <span class="method method-post">POST</span>
+          <div class="ep-path-wrap">
+            <span class="ep-path">/api/auth/refresh</span>
+            <span class="ep-summary">Renew access token silently</span>
+          </div>
+          <div class="ep-badges"><span class="badge badge-green">public</span></div>
+          <i data-lucide="chevron-down" class="ep-chevron icon-sm"></i>
+        </button>
+        <div class="ep-body">
+          <p>Exchange a valid refresh token for a new access token. Old refresh token is revoked (rotation). Each token can only be used once.</p>
+          <div class="code-block">{ <span class="key">"refreshToken"</span>: <span class="str">"abc123..."</span> }</div>
+        </div>
+      </div>
+
+      <div class="ep-item">
+        <button class="ep-toggle">
+          <span class="method method-get">GET</span>
+          <div class="ep-path-wrap">
+            <span class="ep-path">/api/auth/me</span>
+            <span class="ep-summary">Current user profile from JWT</span>
+          </div>
+          <div class="ep-badges"><span class="badge badge-orange">requires auth</span></div>
+          <i data-lucide="chevron-down" class="ep-chevron icon-sm"></i>
+        </button>
+        <div class="ep-body">
+          <p>Returns the authenticated user's profile decoded from the JWT claims.</p>
+        </div>
+      </div>
+
+      <div class="ep-item">
+        <button class="ep-toggle">
+          <span class="method method-post">POST</span>
+          <div class="ep-path-wrap">
+            <span class="ep-path">/api/auth/logout</span>
+            <span class="ep-summary">Revoke refresh token</span>
+          </div>
+          <div class="ep-badges"><span class="badge badge-orange">requires auth</span></div>
+          <i data-lucide="chevron-down" class="ep-chevron icon-sm"></i>
+        </button>
+        <div class="ep-body">
+          <p>Revokes the provided refresh token server-side and sets the user status to offline.</p>
+          <div class="code-block">{ <span class="key">"refreshToken"</span>: <span class="str">"abc123..."</span> }</div>
+        </div>
+      </div>
+
+      <div class="ep-item">
+        <button class="ep-toggle">
+          <span class="method method-post">POST</span>
+          <div class="ep-path-wrap">
+            <span class="ep-path">/api/auth/change-password</span>
+            <span class="ep-summary">Change password (revokes all sessions)</span>
+          </div>
+          <div class="ep-badges"><span class="badge badge-orange">requires auth</span></div>
+          <i data-lucide="chevron-down" class="ep-chevron icon-sm"></i>
+        </button>
+        <div class="ep-body">
+          <p>Changes the authenticated user's password. All existing sessions are revoked after success.</p>
+          <div class="code-block">{ <span class="key">"currentPassword"</span>: <span class="str">"old"</span>, <span class="key">"newPassword"</span>: <span class="str">"new_secure_pw"</span> }</div>
+        </div>
+      </div>
+
+    </div><!-- /ep-list -->
+  </div><!-- /tab-auth -->
+
+  <!-- ─────────────────────────────────────────────────────
+       USERS TAB
+       ───────────────────────────────────────────────────── -->
+  <div class="tab-panel" id="tab-users" role="tabpanel">
+    <div class="panel-header">
+      <div class="panel-header-icon ci-orange"><i data-lucide="users" class="icon-lg"></i></div>
+      <div class="panel-header-text">
+        <h2>Users</h2>
+        <p>Profile management, presence status, search, and soft-delete</p>
       </div>
     </div>
+    <div class="ep-list">
 
-    <h2 id="auth-refresh">POST /api/auth/refresh</h2>
-    <p>Exchange a valid refresh token for a new access token. Old refresh token is revoked (rotation).</p>
-    <div class="code-block" style="position:relative;"><button class="copy-btn">Copy</button>
-{ <span class="key">"refreshToken"</span>: <span class="str">"abc123..."</span> }
+      <div class="ep-item">
+        <button class="ep-toggle">
+          <span class="method method-get">GET</span>
+          <div class="ep-path-wrap">
+            <span class="ep-path">/api/users</span>
+            <span class="ep-summary">List all users sorted by display name</span>
+          </div>
+          <div class="ep-badges"><span class="badge badge-orange">requires auth</span></div>
+          <i data-lucide="chevron-down" class="ep-chevron icon-sm"></i>
+        </button>
+        <div class="ep-body">
+          <p>Returns all non-deleted users ordered by display name. Full profiles (id, username, displayName, email, role, status, isOnline, lastSeen, createdAt).</p>
+          <div class="response-block">
+            <div class="response-label">Response 200</div>
+            <div class="code-block">{ <span class="key">"success"</span>: <span class="num">true</span>, <span class="key">"data"</span>: [ { <span class="key">"id"</span>:<span class="str">"uuid"</span>, <span class="key">"username"</span>:<span class="str">"alice"</span>, <span class="key">"isOnline"</span>:<span class="num">true</span> } ], <span class="key">"total"</span>: <span class="num">3</span> }</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ep-item">
+        <button class="ep-toggle">
+          <span class="method method-get">GET</span>
+          <div class="ep-path-wrap">
+            <span class="ep-path">/api/users/search</span>
+            <span class="ep-summary">Search with filters and pagination</span>
+          </div>
+          <div class="ep-badges"><span class="badge badge-orange">requires auth</span></div>
+          <i data-lucide="chevron-down" class="ep-chevron icon-sm"></i>
+        </button>
+        <div class="ep-body">
+          <p>Full-text search across username, display name, and email with optional role and online-only filters.</p>
+          <h4>Query params</h4>
+          <div class="param-table-wrap"><table class="param-table">
+            <thead><tr><th>Param</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td class="param-name">q</td><td class="param-type">string?</td><td>—</td><td>Full-text search</td></tr>
+              <tr><td class="param-name">role</td><td class="param-type">string?</td><td>—</td><td>Filter by role (User/Admin)</td></tr>
+              <tr><td class="param-name">onlineOnly</td><td class="param-type">bool</td><td>false</td><td>Only online users</td></tr>
+              <tr><td class="param-name">page</td><td class="param-type">int</td><td>1</td><td>Page number</td></tr>
+              <tr><td class="param-name">pageSize</td><td class="param-type">int</td><td>20</td><td>Max 100</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+      </div>
+
+      <div class="ep-item">
+        <button class="ep-toggle">
+          <span class="method method-get">GET</span>
+          <div class="ep-path-wrap">
+            <span class="ep-path">/api/users/online</span>
+            <span class="ep-summary">Currently online users</span>
+          </div>
+          <div class="ep-badges"><span class="badge badge-orange">requires auth</span></div>
+          <i data-lucide="chevron-down" class="ep-chevron icon-sm"></i>
+        </button>
+        <div class="ep-body">
+          <p>Returns public profiles (no email) of all users with status <code>Online</code>.</p>
+        </div>
+      </div>
+
+      <div class="ep-item">
+        <button class="ep-toggle">
+          <span class="method method-get">GET</span>
+          <div class="ep-path-wrap">
+            <span class="ep-path">/api/users/{id}</span>
+            <span class="ep-summary">Get a user by GUID</span>
+          </div>
+          <div class="ep-badges"><span class="badge badge-orange">requires auth</span></div>
+          <i data-lucide="chevron-down" class="ep-chevron icon-sm"></i>
+        </button>
+        <div class="ep-body">
+          <p>Returns the full profile for a single user by their GUID. Returns <code>404</code> if not found or soft-deleted.</p>
+        </div>
+      </div>
+
+      <div class="ep-item">
+        <button class="ep-toggle">
+          <span class="method method-patch">PATCH</span>
+          <div class="ep-path-wrap">
+            <span class="ep-path">/api/users/{id}</span>
+            <span class="ep-summary">Update profile fields</span>
+          </div>
+          <div class="ep-badges"><span class="badge badge-orange">owner or admin</span></div>
+          <i data-lucide="chevron-down" class="ep-chevron icon-sm"></i>
+        </button>
+        <div class="ep-body">
+          <p>Partial update — only supplied fields are written. Owner or admin only.</p>
+          <div class="code-block">{ <span class="key">"displayName"</span>: <span class="str">"Johnny"</span>, <span class="key">"avatarUrl"</span>: <span class="str">"https://..."</span> }</div>
+        </div>
+      </div>
+
+      <div class="ep-item">
+        <button class="ep-toggle">
+          <span class="method method-post">POST</span>
+          <div class="ep-path-wrap">
+            <span class="ep-path">/api/users/{id}/status</span>
+            <span class="ep-summary">Set presence status</span>
+          </div>
+          <div class="ep-badges"><span class="badge badge-orange">owner or admin</span></div>
+          <i data-lucide="chevron-down" class="ep-chevron icon-sm"></i>
+        </button>
+        <div class="ep-body">
+          <p>Sets the full presence status. Also broadcasts <code>UserOnline</code> / <code>UserOffline</code> via WebSocket.</p>
+          <div class="code-block">{ <span class="key">"status"</span>: <span class="num">0</span> } <span class="comment">// 0=Online 1=Away 2=Busy 3=Offline</span></div>
+        </div>
+      </div>
+
+      <div class="ep-item">
+        <button class="ep-toggle">
+          <span class="method method-delete">DELETE</span>
+          <div class="ep-path-wrap">
+            <span class="ep-path">/api/users/{id}</span>
+            <span class="ep-summary">Soft-delete a user</span>
+          </div>
+          <div class="ep-badges"><span class="badge badge-purple">admin only</span></div>
+          <i data-lucide="chevron-down" class="ep-chevron icon-sm"></i>
+        </button>
+        <div class="ep-body">
+          <p>Marks the user as deleted (<code>IsDeleted = true</code>). The record is preserved for audit trail and message authorship. The user can no longer log in.</p>
+        </div>
+      </div>
+
     </div>
+  </div><!-- /tab-users -->
 
-    <h2 id="auth-me">GET /api/auth/me</h2>
-    <p>Returns the currently authenticated user's profile decoded from the JWT. <span class="badge badge-orange">requires auth</span></p>
-
-    <h2 id="auth-logout">POST /api/auth/logout</h2>
-    <p>Revokes the provided refresh token server-side and sets the user offline. <span class="badge badge-orange">requires auth</span></p>
-    <div class="code-block">{ <span class="key">"refreshToken"</span>: <span class="str">"abc123..."</span> }</div>
-
-    <h2 id="auth-password">POST /api/auth/change-password</h2>
-    <p>Change password for the currently authenticated user. All existing sessions are revoked. <span class="badge badge-orange">requires auth</span></p>
-    <div class="code-block">
-{ <span class="key">"currentPassword"</span>: <span class="str">"old"</span>, <span class="key">"newPassword"</span>: <span class="str">"new"</span>, <span class="key">"confirmPassword"</span>: <span class="str">"new"</span> }
-    </div>
-
-    <!-- ═══ USERS ═══ -->
-    <h2 id="users-list">GET /api/users</h2>
-    <p>Returns all registered users sorted by display name. <span class="badge badge-orange">requires auth</span></p>
-    <div class="response-block">
-      <div class="response-label">Response 200</div>
-      <div class="code-block">{ <span class="key">"success"</span>: <span class="num">true</span>, <span class="key">"data"</span>: [ { <span class="key">"id"</span>:<span class="str">"550e8400-e29b-41d4..."</span>, <span class="key">"username"</span>:<span class="str">"alice"</span>, <span class="key">"isOnline"</span>:<span class="num">true</span> } ], <span class="key">"total"</span>: <span class="num">3</span> }</div>
-    </div>
-
-    <h2 id="users-get">GET /api/users/{id}</h2>
-    <p>Fetch a single user by their GUID. <span class="badge badge-orange">requires auth</span></p>
-
-    <h2 id="users-create">POST /api/users</h2>
-    <p>Create a new user. Usernames must be unique. Returns the new user with a generated GUID. <span class="badge badge-orange">requires auth</span></p>
-    <div class="code-block" style="position:relative;"><button class="copy-btn">Copy</button>
-{
-  <span class="key">"username"</span>:    <span class="str">"john_doe"</span>,
-  <span class="key">"displayName"</span>: <span class="str">"John Doe"</span>,
-  <span class="key">"email"</span>:       <span class="str">"john@example.com"</span>
-}
-    </div>
-
-    <h2 id="users-update">PATCH /api/users/{id}</h2>
-    <p>Partially update a user profile. <span class="badge badge-orange">requires auth</span></p>
-    <div class="code-block">{ <span class="key">"displayName"</span>: <span class="str">"Johnny"</span>, <span class="key">"avatarUrl"</span>: <span class="str">"https://..."</span> }</div>
-
-    <h2 id="users-status">POST /api/users/{id}/status</h2>
-    <p>Set online/offline/away status. Also broadcasts <code>UserOnline</code> / <code>UserOffline</code> via WebSocket. <span class="badge badge-orange">requires auth</span></p>
-    <div class="code-block">{ <span class="key">"isOnline"</span>: <span class="num">true</span> }</div>
-
-    <h2 id="users-delete">DELETE /api/users/{id}</h2>
-    <p>Soft-deletes a user record (preserves history). <span class="badge badge-purple">admin only</span></p>
-
-    <!-- ═══ ROOMS ═══ -->
-    <h2 id="rooms-list">GET /api/rooms</h2>
-    <p>Returns all active (non-deleted) rooms sorted by latest message activity. <span class="badge badge-orange">requires auth</span></p>
-
-    <h2 id="rooms-by-user">GET /api/rooms/user/{userId}</h2>
-    <p>Returns only the rooms that include the given user as a member. <span class="badge badge-orange">requires auth</span></p>
-
-    <h2 id="rooms-get">GET /api/rooms/{id}</h2>
-    <p>Fetch a single room with member IDs and last-message preview. <span class="badge badge-orange">requires auth</span></p>
-
-    <h2 id="rooms-create">POST /api/rooms</h2>
-    <p>Create a new room. A URL-safe <code>slug</code> is auto-generated from the name via SlugHelper. <code>type</code>: <code>0</code> = Direct, <code>1</code> = Group, <code>2</code> = Channel. <span class="badge badge-orange">requires auth</span></p>
-    <div class="code-block" style="position:relative;"><button class="copy-btn">Copy</button>
-{
-  <span class="key">"name"</span>:       <span class="str">"engineering"</span>,
-  <span class="key">"description"</span>:<span class="str">"Engineering team chat"</span>,
-  <span class="key">"type"</span>:       <span class="num">1</span>,
-  <span class="key">"memberIds"</span>:  [<span class="str">"550e8400-..."</span>, <span class="str">"6ba7b810-..."</span>]
-}
-    </div>
-
-    <h2 id="rooms-members">POST /api/rooms/{id}/members</h2>
-    <p>Add a user to an existing room. <span class="badge badge-orange">requires auth</span></p>
-    <div class="code-block">{ <span class="key">"userId"</span>: <span class="str">"550e8400-..."</span> }</div>
-
-    <h2 id="rooms-remove">DELETE /api/rooms/{id}/members/{userId}</h2>
-    <p>Remove a specific user from a room. <span class="badge badge-orange">requires auth</span></p>
-
-    <!-- ═══ MESSAGES ═══ -->
-    <h2 id="msg-history">GET /api/messages/room/{roomId}</h2>
-    <p>Returns paginated message history, ordered oldest → newest. Soft-deleted messages show content as <code>[Message deleted]</code>. <span class="badge badge-orange">requires auth</span></p>
-    <div class="param-table-wrap">
-      <table class="param-table">
-        <thead><tr><th>Query Param</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
-        <tbody>
-          <tr><td class="param-name">limit</td><td class="param-type">int</td><td>50</td><td>Messages per page</td></tr>
-          <tr><td class="param-name">skip</td><td class="param-type">int</td><td>0</td><td>Offset for pagination</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <h2 id="msg-send">POST /api/messages</h2>
-    <p>Send a message. Automatically broadcasts <code>ReceiveMessage</code> to all room WebSocket subscribers. <span class="badge badge-orange">requires auth</span></p>
-    <div class="code-block" style="position:relative;"><button class="copy-btn">Copy</button>
-{
-  <span class="key">"roomId"</span>:   <span class="str">"550e8400-..."</span>,
-  <span class="key">"senderId"</span>: <span class="str">"6ba7b810-..."</span>,
-  <span class="key">"content"</span>:  <span class="str">"Hello world!"</span>,
-  <span class="key">"type"</span>:     <span class="num">0</span>   <span class="comment">// 0=Text, 1=Image, 2=File, 3=System</span>
-}
-    </div>
-
-    <h2 id="msg-edit">PATCH /api/messages/{id}</h2>
-    <p>Edit message content. Emits <code>MessageEdited</code> to room subscribers. Only the original sender can edit. <span class="badge badge-orange">requires auth</span></p>
-    <div class="code-block">{ <span class="key">"content"</span>: <span class="str">"Updated message text"</span> }</div>
-
-    <h2 id="msg-delete">DELETE /api/messages/{id}</h2>
-    <p>Soft-deletes a message. <code>IsDeleted = true</code>, content replaced with <code>[Message deleted]</code>. Emits <code>MessageDeleted</code>. <span class="badge badge-orange">requires auth</span></p>
-
-    <h2 id="msg-read">POST /api/messages/{id}/read</h2>
-    <p>Mark a message as read by a specific user. <span class="badge badge-orange">requires auth</span></p>
-    <div class="code-block">{ <span class="key">"userId"</span>: <span class="str">"550e8400-..."</span> }</div>
-
-    <h2 id="msg-unread">GET /api/messages/room/{roomId}/unread?userId={userId}</h2>
-    <p>Returns the count of unread messages in a room for a user (excludes their own messages). <span class="badge badge-orange">requires auth</span></p>
-
-    <!-- ═══ FILES ═══ -->
-    <h2 id="files-upload">POST /api/files/upload</h2>
-    <p>Upload a file using <code>multipart/form-data</code>. Max 20 MB. <span class="badge badge-orange">requires auth</span></p>
-    <div class="warn-box">
-      <i data-lucide="alert-triangle" class="icon-sm box-icon"></i>
-      <div class="box-body">
-        <strong>Allowed types:</strong> .jpg, .jpeg, .png, .gif, .webp, .pdf, .txt, .zip, .mp4, .mp3
+  <!-- ─────────────────────────────────────────────────────
+       ROOMS TAB
+       ───────────────────────────────────────────────────── -->
+  <div class="tab-panel" id="tab-rooms" role="tabpanel">
+    <div class="panel-header">
+      <div class="panel-header-icon ci-green"><i data-lucide="message-square" class="icon-lg"></i></div>
+      <div class="panel-header-text">
+        <h2>Rooms</h2>
+        <p>Group, Direct, and Channel rooms with auto-slug, tags, categories, and member management</p>
       </div>
     </div>
-    <div class="param-table-wrap">
-      <table class="param-table">
-        <thead><tr><th>Form Field</th><th>Type</th><th>Description</th></tr></thead>
-        <tbody>
-          <tr><td class="param-name">file</td><td class="param-type">file</td><td>The file to upload <span class="param-req">required</span></td></tr>
-          <tr><td class="param-name">roomId</td><td class="param-type">string</td><td>If provided, creates a message in this room</td></tr>
-          <tr><td class="param-name">senderId</td><td class="param-type">string</td><td>Sender GUID for the auto-created message</td></tr>
-        </tbody>
-      </table>
-    </div>
+    <div class="ep-list">
 
-    <h2 id="files-delete">DELETE /api/files/{fileName}</h2>
-    <p>Delete a previously uploaded file by its stored filename (UUID + extension). Path-traversal safe. <span class="badge badge-orange">requires auth</span></p>
+      <div class="ep-item">
+        <button class="ep-toggle">
+          <span class="method method-get">GET</span>
+          <div class="ep-path-wrap">
+            <span class="ep-path">/api/rooms</span>
+            <span class="ep-summary">All rooms sorted by last activity</span>
+          </div>
+          <div class="ep-badges"><span class="badge badge-orange">requires auth</span></div>
+          <i data-lucide="chevron-down" class="ep-chevron icon-sm"></i>
+        </button>
+        <div class="ep-body">
+          <p>Returns all non-deleted, non-archived rooms ordered by most recent message activity.</p>
+        </div>
+      </div>
 
-    <!-- ═══ AUDIT ═══ -->
-    <h2 id="audit-recent">GET /api/audit/recent</h2>
-    <p>Returns the most recent audit events. <span class="badge badge-purple">admin only</span></p>
-    <div class="param-table-wrap">
-      <table class="param-table">
-        <thead><tr><th>Query Param</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
-        <tbody>
-          <tr><td class="param-name">count</td><td class="param-type">int</td><td>50</td><td>Number of events to return</td></tr>
-        </tbody>
-      </table>
+      <div class="ep-item">
+        <button class="ep-toggle">
+          <span class="method method-get">GET</span>
+          <div class="ep-path-wrap">
+            <span class="ep-path">/api/rooms/search</span>
+            <span class="ep-summary">Filter and paginate rooms</span>
+          </div>
+          <div class="ep-badges"><span class="badge badge-orange">requires auth</span></div>
+          <i data-lucide="chevron-down" class="ep-chevron icon-sm"></i>
+        </button>
+        <div class="ep-body">
+          <div class="param-table-wrap"><table class="param-table">
+            <thead><tr><th>Param</th><th>Type</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td class="param-name">q</td><td class="param-type">string?</td><td>Search name, description, tags</td></tr>
+              <tr><td class="param-name">category</td><td class="param-type">string?</td><td>Exact category match (case-insensitive)</td></tr>
+              <tr><td class="param-name">tag</td><td class="param-type">string?</td><td>Filter by a single tag</td></tr>
+              <tr><td class="param-name">type</td><td class="param-type">int?</td><td>0=Direct 1=Group 2=Channel</td></tr>
+              <tr><td class="param-name">includeArchived</td><td class="param-type">bool</td><td>Include archived rooms</td></tr>
+              <tr><td class="param-name">sortBy</td><td class="param-type">string</td><td>activity | name | createdAt | memberCount</td></tr>
+              <tr><td class="param-name">direction</td><td class="param-type">string</td><td>asc | desc</td></tr>
+              <tr><td class="param-name">page / pageSize</td><td class="param-type">int</td><td>Pagination (pageSize max 100)</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+      </div>
+
+      <div class="ep-item">
+        <button class="ep-toggle">
+          <span class="method method-get">GET</span>
+          <div class="ep-path-wrap">
+            <span class="ep-path">/api/rooms/categories</span>
+            <span class="ep-summary">All distinct categories</span>
+          </div>
+          <div class="ep-badges"><span class="badge badge-orange">requires auth</span></div>
+          <i data-lucide="chevron-down" class="ep-chevron icon-sm"></i>
+        </button>
+        <div class="ep-body"><p>Returns a deduplicated, sorted list of all room categories in use.</p></div>
+      </div>
+
+      <div class="ep-item">
+        <button class="ep-toggle">
+          <span class="method method-get">GET</span>
+          <div class="ep-path-wrap">
+            <span class="ep-path">/api/rooms/tags</span>
+            <span class="ep-summary">All distinct tags</span>
+          </div>
+          <div class="ep-badges"><span class="badge badge-orange">requires auth</span></div>
+          <i data-lucide="chevron-down" class="ep-chevron icon-sm"></i>
+        </button>
+        <div class="ep-body"><p>Returns a deduplicated, sorted list of all tags across all rooms.</p></div>
+      </div>
+
+      <div class="ep-item">
+        <button class="ep-toggle">
+          <span class="method method-get">GET</span>
+          <div class="ep-path-wrap">
+            <span class="ep-path">/api/rooms/mine</span>
+            <span class="ep-summary">Current user's rooms</span>
+          </div>
+          <div class="ep-badges"><span class="badge badge-orange">requires auth</span></div>
+          <i data-lucide="chevron-down" class="ep-chevron icon-sm"></i>
+        </button>
+        <div class="ep-body"><p>Returns all rooms where the authenticated user is a member, sorted by latest activity.</p></div>
+      </div>
+
+      <div class="ep-item">
+        <button class="ep-toggle">
+          <span class="method method-get">GET</span>
+          <div class="ep-path-wrap">
+            <span class="ep-path">/api/rooms/{id}</span>
+            <span class="ep-summary">Get room by ID</span>
+          </div>
+          <div class="ep-badges"><span class="badge badge-orange">requires auth</span></div>
+          <i data-lucide="chevron-down" class="ep-chevron icon-sm"></i>
+        </button>
+        <div class="ep-body"><p>Returns the full room object including memberIds and last-message preview.</p></div>
+      </div>
+
+      <div class="ep-item">
+        <button class="ep-toggle">
+          <span class="method method-get">GET</span>
+          <div class="ep-path-wrap">
+            <span class="ep-path">/api/rooms/slug/{slug}</span>
+            <span class="ep-summary">Get room by slug</span>
+          </div>
+          <div class="ep-badges"><span class="badge badge-orange">requires auth</span></div>
+          <i data-lucide="chevron-down" class="ep-chevron icon-sm"></i>
+        </button>
+        <div class="ep-body"><p>Lookup a room by its URL-safe slug (e.g. <code>engineering-team</code>). Case-insensitive.</p></div>
+      </div>
+
+      <div class="ep-item">
+        <button class="ep-toggle">
+          <span class="method method-post">POST</span>
+          <div class="ep-path-wrap">
+            <span class="ep-path">/api/rooms</span>
+            <span class="ep-summary">Create a room</span>
+          </div>
+          <div class="ep-badges"><span class="badge badge-orange">requires auth</span></div>
+          <i data-lucide="chevron-down" class="ep-chevron icon-sm"></i>
+        </button>
+        <div class="ep-body">
+          <p>Creates a new room. A URL-safe <code>slug</code> is auto-generated from the name (uniquified with a suffix if needed). Creator is automatically added as a member.</p>
+          <div class="code-block" style="position:relative"><button class="copy-btn">Copy</button>
+{
+  <span class="key">"name"</span>:        <span class="str">"Engineering"</span>,
+  <span class="key">"description"</span>: <span class="str">"Engineering team chat"</span>,
+  <span class="key">"category"</span>:    <span class="str">"tech"</span>,
+  <span class="key">"tags"</span>:        [<span class="str">"dev"</span>, <span class="str">"backend"</span>],
+  <span class="key">"type"</span>:        <span class="num">1</span>,
+  <span class="key">"isPrivate"</span>:   <span class="num">false</span>,
+  <span class="key">"memberIds"</span>:   [<span class="str">"uuid-1"</span>, <span class="str">"uuid-2"</span>]
+}</div>
+        </div>
+      </div>
+
+      <div class="ep-item">
+        <button class="ep-toggle">
+          <span class="method method-patch">PATCH</span>
+          <div class="ep-path-wrap">
+            <span class="ep-path">/api/rooms/{id}</span>
+            <span class="ep-summary">Update room fields</span>
+          </div>
+          <div class="ep-badges"><span class="badge badge-orange">requires auth</span></div>
+          <i data-lucide="chevron-down" class="ep-chevron icon-sm"></i>
+        </button>
+        <div class="ep-body">
+          <p>Partially update name, description, category, tags, isPrivate, or isArchived. Changing the name re-generates the slug automatically.</p>
+        </div>
+      </div>
+
+      <div class="ep-item">
+        <button class="ep-toggle">
+          <span class="method method-post">POST</span>
+          <div class="ep-path-wrap">
+            <span class="ep-path">/api/rooms/{id}/archive</span>
+            <span class="ep-summary">Archive / unarchive a room</span>
+          </div>
+          <div class="ep-badges"><span class="badge badge-orange">requires auth</span></div>
+          <i data-lucide="chevron-down" class="ep-chevron icon-sm"></i>
+        </button>
+        <div class="ep-body">
+          <p>Toggles the archived state. Use <code>POST /api/rooms/{id}/unarchive</code> to restore.</p>
+        </div>
+      </div>
+
+      <div class="ep-item">
+        <button class="ep-toggle">
+          <span class="method method-post">POST</span>
+          <div class="ep-path-wrap">
+            <span class="ep-path">/api/rooms/{id}/join</span>
+            <span class="ep-summary">Join a room</span>
+          </div>
+          <div class="ep-badges"><span class="badge badge-orange">requires auth</span></div>
+          <i data-lucide="chevron-down" class="ep-chevron icon-sm"></i>
+        </button>
+        <div class="ep-body"><p>Adds the current user as a member. Private rooms require admin role.</p></div>
+      </div>
+
+      <div class="ep-item">
+        <button class="ep-toggle">
+          <span class="method method-delete">DELETE</span>
+          <div class="ep-path-wrap">
+            <span class="ep-path">/api/rooms/{id}/leave</span>
+            <span class="ep-summary">Leave a room</span>
+          </div>
+          <div class="ep-badges"><span class="badge badge-orange">requires auth</span></div>
+          <i data-lucide="chevron-down" class="ep-chevron icon-sm"></i>
+        </button>
+        <div class="ep-body"><p>Removes the current user from the room's member list.</p></div>
+      </div>
+
+      <div class="ep-item">
+        <button class="ep-toggle">
+          <span class="method method-get">GET</span>
+          <div class="ep-path-wrap">
+            <span class="ep-path">/api/rooms/{id}/members/profiles</span>
+            <span class="ep-summary">Full public profiles of all members</span>
+          </div>
+          <div class="ep-badges"><span class="badge badge-orange">requires auth</span></div>
+          <i data-lucide="chevron-down" class="ep-chevron icon-sm"></i>
+        </button>
+        <div class="ep-body"><p>Returns public profile objects (no email) for every member of the room.</p></div>
+      </div>
+
+      <div class="ep-item">
+        <button class="ep-toggle">
+          <span class="method method-post">POST</span>
+          <div class="ep-path-wrap">
+            <span class="ep-path">/api/rooms/{id}/members</span>
+            <span class="ep-summary">Add a member</span>
+          </div>
+          <div class="ep-badges"><span class="badge badge-orange">requires auth</span></div>
+          <i data-lucide="chevron-down" class="ep-chevron icon-sm"></i>
+        </button>
+        <div class="ep-body">
+          <div class="code-block">{ <span class="key">"userId"</span>: <span class="str">"uuid"</span> }</div>
+        </div>
+      </div>
+
+      <div class="ep-item">
+        <button class="ep-toggle">
+          <span class="method method-delete">DELETE</span>
+          <div class="ep-path-wrap">
+            <span class="ep-path">/api/rooms/{id}/members/{userId}</span>
+            <span class="ep-summary">Remove a member</span>
+          </div>
+          <div class="ep-badges"><span class="badge badge-orange">requires auth</span></div>
+          <i data-lucide="chevron-down" class="ep-chevron icon-sm"></i>
+        </button>
+        <div class="ep-body"><p>Removes the specified user from the room member list.</p></div>
+      </div>
+
+      <div class="ep-item">
+        <button class="ep-toggle">
+          <span class="method method-delete">DELETE</span>
+          <div class="ep-path-wrap">
+            <span class="ep-path">/api/rooms/{id}</span>
+            <span class="ep-summary">Soft-delete a room</span>
+          </div>
+          <div class="ep-badges"><span class="badge badge-purple">admin only</span></div>
+          <i data-lucide="chevron-down" class="ep-chevron icon-sm"></i>
+        </button>
+        <div class="ep-body"><p>Soft-deletes the room. Messages are preserved for audit. The room stops appearing in listings and searches.</p></div>
+      </div>
+
     </div>
-    <div class="response-block">
-      <div class="response-label">Response 200</div>
-      <div class="code-block">
-{ <span class="key">"success"</span>: <span class="num">true</span>, <span class="key">"data"</span>: [ { <span class="key">"action"</span>:<span class="str">"auth.login"</span>, <span class="key">"username"</span>:<span class="str">"alice"</span>, <span class="key">"success"</span>:<span class="num">true</span>, <span class="key">"timestamp"</span>:<span class="str">"2025-01-01T12:00:00Z"</span> } ] }
+  </div><!-- /tab-rooms -->
+
+  <!-- ─────────────────────────────────────────────────────
+       MESSAGES TAB
+       ───────────────────────────────────────────────────── -->
+  <div class="tab-panel" id="tab-messages" role="tabpanel">
+    <div class="panel-header">
+      <div class="panel-header-icon ci-amber"><i data-lucide="mail" class="icon-lg"></i></div>
+      <div class="panel-header-text">
+        <h2>Messages</h2>
+        <p>Send, edit, soft-delete, paginate, search, read receipts, and emoji reactions</p>
       </div>
     </div>
+    <div class="ep-list">
 
-    <h2 id="audit-search">GET /api/audit/search</h2>
-    <p>Filter audit events by user, action key, and/or date range. <span class="badge badge-purple">admin only</span></p>
-    <div class="param-table-wrap">
-      <table class="param-table">
-        <thead><tr><th>Query Param</th><th>Type</th><th>Description</th></tr></thead>
-        <tbody>
-          <tr><td class="param-name">userId</td><td class="param-type">string?</td><td>Filter by user GUID</td></tr>
-          <tr><td class="param-name">action</td><td class="param-type">string?</td><td>Filter by action key (e.g. <code>auth.login</code>)</td></tr>
-          <tr><td class="param-name">from</td><td class="param-type">DateTime?</td><td>Start of date range (UTC)</td></tr>
-          <tr><td class="param-name">to</td><td class="param-type">DateTime?</td><td>End of date range (UTC)</td></tr>
-          <tr><td class="param-name">limit</td><td class="param-type">int</td><td>Max results (default 100)</td></tr>
-        </tbody>
-      </table>
+      <div class="ep-item">
+        <button class="ep-toggle">
+          <span class="method method-get">GET</span>
+          <div class="ep-path-wrap">
+            <span class="ep-path">/api/messages/room/{roomId}</span>
+            <span class="ep-summary">Paginated message history</span>
+          </div>
+          <div class="ep-badges"><span class="badge badge-orange">requires auth</span></div>
+          <i data-lucide="chevron-down" class="ep-chevron icon-sm"></i>
+        </button>
+        <div class="ep-body">
+          <p>Returns a page of messages ordered oldest → newest for display. Pagination walks newest-first then re-sorts. Soft-deleted messages show <code>[Message deleted]</code>.</p>
+          <div class="param-table-wrap"><table class="param-table">
+            <thead><tr><th>Param</th><th>Type</th><th>Default</th></tr></thead>
+            <tbody>
+              <tr><td class="param-name">limit</td><td class="param-type">int</td><td>50</td></tr>
+              <tr><td class="param-name">skip</td><td class="param-type">int</td><td>0</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+      </div>
+
+      <div class="ep-item">
+        <button class="ep-toggle">
+          <span class="method method-get">GET</span>
+          <div class="ep-path-wrap">
+            <span class="ep-path">/api/messages/room/{roomId}/search</span>
+            <span class="ep-summary">Search messages with filters</span>
+          </div>
+          <div class="ep-badges"><span class="badge badge-orange">requires auth</span></div>
+          <i data-lucide="chevron-down" class="ep-chevron icon-sm"></i>
+        </button>
+        <div class="ep-body">
+          <div class="param-table-wrap"><table class="param-table">
+            <thead><tr><th>Param</th><th>Type</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td class="param-name">q</td><td class="param-type">string?</td><td>Full-text search in content</td></tr>
+              <tr><td class="param-name">senderId</td><td class="param-type">string?</td><td>Filter by sender GUID</td></tr>
+              <tr><td class="param-name">tag</td><td class="param-type">string?</td><td>Filter by tag</td></tr>
+              <tr><td class="param-name">type</td><td class="param-type">int?</td><td>0=Text 1=Image 2=File 3=System</td></tr>
+              <tr><td class="param-name">from / to</td><td class="param-type">DateTime?</td><td>Date range filter (UTC)</td></tr>
+              <tr><td class="param-name">page / pageSize</td><td class="param-type">int</td><td>Pagination</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+      </div>
+
+      <div class="ep-item">
+        <button class="ep-toggle">
+          <span class="method method-get">GET</span>
+          <div class="ep-path-wrap">
+            <span class="ep-path">/api/messages/room/{roomId}/unread</span>
+            <span class="ep-summary">Unread count for current user</span>
+          </div>
+          <div class="ep-badges"><span class="badge badge-orange">requires auth</span></div>
+          <i data-lucide="chevron-down" class="ep-chevron icon-sm"></i>
+        </button>
+        <div class="ep-body"><p>Returns the count of messages in the room that the current user has not yet read (excluding their own messages).</p></div>
+      </div>
+
+      <div class="ep-item">
+        <button class="ep-toggle">
+          <span class="method method-post">POST</span>
+          <div class="ep-path-wrap">
+            <span class="ep-path">/api/messages</span>
+            <span class="ep-summary">Send a message</span>
+          </div>
+          <div class="ep-badges"><span class="badge badge-orange">requires auth</span></div>
+          <i data-lucide="chevron-down" class="ep-chevron icon-sm"></i>
+        </button>
+        <div class="ep-body">
+          <p>Persists the message and broadcasts <code>ReceiveMessage</code> via SignalR to all room subscribers.</p>
+          <div class="code-block" style="position:relative"><button class="copy-btn">Copy</button>
+{
+  <span class="key">"roomId"</span>:  <span class="str">"room-uuid"</span>,
+  <span class="key">"content"</span>: <span class="str">"Hello world!"</span>,
+  <span class="key">"type"</span>:    <span class="num">0</span>,  <span class="comment">// 0=Text 1=Image 2=File 3=System</span>
+  <span class="key">"tags"</span>:    [<span class="str">"pinned"</span>]
+}</div>
+        </div>
+      </div>
+
+      <div class="ep-item">
+        <button class="ep-toggle">
+          <span class="method method-patch">PATCH</span>
+          <div class="ep-path-wrap">
+            <span class="ep-path">/api/messages/{id}</span>
+            <span class="ep-summary">Edit message content</span>
+          </div>
+          <div class="ep-badges"><span class="badge badge-orange">sender only</span></div>
+          <i data-lucide="chevron-down" class="ep-chevron icon-sm"></i>
+        </button>
+        <div class="ep-body">
+          <p>Updates the message content and sets <code>isEdited = true</code>. Emits <code>MessageEdited</code> to room subscribers. Only the original sender can edit.</p>
+          <div class="code-block">{ <span class="key">"content"</span>: <span class="str">"Updated message"</span> }</div>
+        </div>
+      </div>
+
+      <div class="ep-item">
+        <button class="ep-toggle">
+          <span class="method method-delete">DELETE</span>
+          <div class="ep-path-wrap">
+            <span class="ep-path">/api/messages/{id}</span>
+            <span class="ep-summary">Soft-delete a message</span>
+          </div>
+          <div class="ep-badges"><span class="badge badge-orange">sender or admin</span></div>
+          <i data-lucide="chevron-down" class="ep-chevron icon-sm"></i>
+        </button>
+        <div class="ep-body">
+          <p>Sets <code>isDeleted = true</code>, replaces content with <code>[Message deleted]</code>. Emits <code>MessageDeleted</code>. History is preserved for audit.</p>
+        </div>
+      </div>
+
+      <div class="ep-item">
+        <button class="ep-toggle">
+          <span class="method method-post">POST</span>
+          <div class="ep-path-wrap">
+            <span class="ep-path">/api/messages/{id}/read</span>
+            <span class="ep-summary">Mark message as read</span>
+          </div>
+          <div class="ep-badges"><span class="badge badge-orange">requires auth</span></div>
+          <i data-lucide="chevron-down" class="ep-chevron icon-sm"></i>
+        </button>
+        <div class="ep-body"><p>Adds the current user to the message's <code>readBy</code> set. Idempotent — safe to call multiple times.</p></div>
+      </div>
+
+      <div class="ep-item">
+        <button class="ep-toggle">
+          <span class="method method-post">POST</span>
+          <div class="ep-path-wrap">
+            <span class="ep-path">/api/messages/{id}/reactions</span>
+            <span class="ep-summary">Add emoji reaction</span>
+          </div>
+          <div class="ep-badges"><span class="badge badge-orange">requires auth</span></div>
+          <i data-lucide="chevron-down" class="ep-chevron icon-sm"></i>
+        </button>
+        <div class="ep-body">
+          <div class="code-block">{ <span class="key">"emoji"</span>: <span class="str">"👍"</span> }</div>
+        </div>
+      </div>
+
+      <div class="ep-item">
+        <button class="ep-toggle">
+          <span class="method method-delete">DELETE</span>
+          <div class="ep-path-wrap">
+            <span class="ep-path">/api/messages/{id}/reactions/{emoji}</span>
+            <span class="ep-summary">Remove emoji reaction</span>
+          </div>
+          <div class="ep-badges"><span class="badge badge-orange">requires auth</span></div>
+          <i data-lucide="chevron-down" class="ep-chevron icon-sm"></i>
+        </button>
+        <div class="ep-body"><p>Removes the current user's reaction for the given emoji from the message.</p></div>
+      </div>
+
     </div>
+  </div><!-- /tab-messages -->
 
-    <h2 id="audit-by-user">GET /api/audit/user/{userId}</h2>
-    <p>Returns all audit events for a specific user. <span class="badge badge-purple">admin only</span></p>
-
-    <h2 id="audit-by-action">GET /api/audit/action/{action}</h2>
-    <p>Returns all audit events matching an action key, e.g. <code>auth.login</code>, <code>file.upload</code>, <code>file.delete</code>. <span class="badge badge-purple">admin only</span></p>
+  <!-- ─────────────────────────────────────────────────────
+       FILES TAB
+       ───────────────────────────────────────────────────── -->
+  <div class="tab-panel" id="tab-files" role="tabpanel">
+    <div class="panel-header">
+      <div class="panel-header-icon ci-teal"><i data-lucide="upload" class="icon-lg"></i></div>
+      <div class="panel-header-text">
+        <h2>Files</h2>
+        <p>Local blob storage · UUID filenames · MIME validation · path-traversal safe · 20 req/min</p>
+      </div>
+    </div>
     <div class="info-box">
       <i data-lucide="info" class="icon-sm box-icon"></i>
       <div class="box-body">
-        <strong>Audit action keys:</strong><br/>
-        <code>auth.register</code> · <code>auth.login</code> · <code>auth.login.failed</code> · <code>auth.logout</code> ·
-        <code>auth.refresh</code> · <code>auth.password.changed</code> · <code>file.upload</code> ·
-        <code>file.delete</code> · <code>file.delete.rejected</code>
+        <strong>Allowed types:</strong>
+        <code>.jpg</code> <code>.jpeg</code> <code>.png</code> <code>.gif</code> <code>.webp</code>
+        <code>.pdf</code> <code>.txt</code> <code>.zip</code> <code>.mp4</code> <code>.mp3</code>
+        &nbsp;·&nbsp; Max size: <strong>20 MB</strong>
       </div>
     </div>
+    <div class="ep-list">
 
-    <!-- ═══ WEBSOCKET ═══ -->
-    <h2 id="ws-connect">WebSocket — Connect</h2>
-    <p>The WebSocket hub is powered by <strong>ASP.NET Core SignalR</strong>. Connections require a valid JWT — the hub has <code>[Authorize]</code> and reads identity from the token, not from client-supplied parameters.</p>
+      <div class="ep-item">
+        <button class="ep-toggle">
+          <span class="method method-post">POST</span>
+          <div class="ep-path-wrap">
+            <span class="ep-path">/api/files/upload</span>
+            <span class="ep-summary">Upload a file (multipart)</span>
+          </div>
+          <div class="ep-badges"><span class="badge badge-orange">requires auth</span></div>
+          <i data-lucide="chevron-down" class="ep-chevron icon-sm"></i>
+        </button>
+        <div class="ep-body">
+          <p>Upload a file using <code>multipart/form-data</code>. Returns the stored filename (UUID + extension) and public URL. Rate limited to 20 req/min.</p>
+          <div class="param-table-wrap"><table class="param-table">
+            <thead><tr><th>Form Field</th><th>Type</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td class="param-name">file</td><td class="param-type">file</td><td>The file to upload <span class="param-req">required</span></td></tr>
+              <tr><td class="param-name">roomId</td><td class="param-type">string?</td><td>If provided, auto-creates a File message in this room</td></tr>
+            </tbody>
+          </table></div>
+          <div class="response-block">
+            <div class="response-label">Response 201</div>
+            <div class="code-block">{ <span class="key">"fileName"</span>: <span class="str">"550e8400-e29b.jpg"</span>, <span class="key">"url"</span>: <span class="str">"/uploads/550e8400-e29b.jpg"</span>, <span class="key">"size"</span>: <span class="num">204800</span> }</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ep-item">
+        <button class="ep-toggle">
+          <span class="method method-delete">DELETE</span>
+          <div class="ep-path-wrap">
+            <span class="ep-path">/api/files/{fileName}</span>
+            <span class="ep-summary">Delete an uploaded file</span>
+          </div>
+          <div class="ep-badges"><span class="badge badge-orange">requires auth</span></div>
+          <i data-lucide="chevron-down" class="ep-chevron icon-sm"></i>
+        </button>
+        <div class="ep-body">
+          <p>Deletes a file by its stored name (UUID + extension). Path-traversal protected — only files within <code>wwwroot/uploads/</code> can be deleted.</p>
+        </div>
+      </div>
+
+      <div class="ep-item">
+        <button class="ep-toggle">
+          <span class="method method-get">GET</span>
+          <div class="ep-path-wrap">
+            <span class="ep-path">/uploads/{fileName}</span>
+            <span class="ep-summary">Serve a file (static)</span>
+          </div>
+          <div class="ep-badges"><span class="badge badge-green">public</span></div>
+          <i data-lucide="chevron-down" class="ep-chevron icon-sm"></i>
+        </button>
+        <div class="ep-body">
+          <p>Static file served directly by ASP.NET Core. No auth required — use UUID filenames for obscurity. Files are stored under <code>wwwroot/uploads/</code>.</p>
+        </div>
+      </div>
+
+    </div>
+  </div><!-- /tab-files -->
+
+  <!-- ─────────────────────────────────────────────────────
+       AUDIT TAB
+       ───────────────────────────────────────────────────── -->
+  <div class="tab-panel" id="tab-audit" role="tabpanel">
+    <div class="panel-header">
+      <div class="panel-header-icon ci-red"><i data-lucide="scroll-text" class="icon-lg"></i></div>
+      <div class="panel-header-text">
+        <h2>Audit</h2>
+        <p>Structured event log for auth, file, and admin actions — admin access only</p>
+      </div>
+    </div>
     <div class="info-box">
       <i data-lucide="info" class="icon-sm box-icon"></i>
       <div class="box-body">
-        <strong>Endpoint:</strong> <code>/hubs/chat</code><br/>
-        <strong>Auth:</strong> Pass JWT as query string: <code>?access_token=YOUR_JWT</code><br/>
-        <strong>Presence:</strong> Connection/disconnection automatically broadcasts <code>UserOnline</code> / <code>UserOffline</code> to all clients. Identity is read from the JWT — no userId argument needed.
+        <strong>Tracked action keys:</strong>
+        <code>auth.register</code> · <code>auth.login</code> · <code>auth.login.failed</code> · <code>auth.logout</code> · <code>auth.refresh</code> · <code>auth.password.changed</code> · <code>file.upload</code> · <code>file.delete</code> · <code>file.delete.rejected</code>
+      </div>
+    </div>
+    <div class="ep-list">
+
+      <div class="ep-item">
+        <button class="ep-toggle">
+          <span class="method method-get">GET</span>
+          <div class="ep-path-wrap">
+            <span class="ep-path">/api/audit/recent</span>
+            <span class="ep-summary">Latest N audit events</span>
+          </div>
+          <div class="ep-badges"><span class="badge badge-purple">admin only</span></div>
+          <i data-lucide="chevron-down" class="ep-chevron icon-sm"></i>
+        </button>
+        <div class="ep-body">
+          <div class="param-table-wrap"><table class="param-table">
+            <thead><tr><th>Param</th><th>Type</th><th>Default</th></tr></thead>
+            <tbody>
+              <tr><td class="param-name">count</td><td class="param-type">int</td><td>50</td></tr>
+            </tbody>
+          </table></div>
+          <div class="response-block">
+            <div class="response-label">Response 200</div>
+            <div class="code-block">{ <span class="key">"data"</span>: [ { <span class="key">"action"</span>:<span class="str">"auth.login"</span>, <span class="key">"username"</span>:<span class="str">"alice"</span>, <span class="key">"success"</span>:<span class="num">true</span>, <span class="key">"timestamp"</span>:<span class="str">"2025-01-01T12:00Z"</span> } ] }</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ep-item">
+        <button class="ep-toggle">
+          <span class="method method-get">GET</span>
+          <div class="ep-path-wrap">
+            <span class="ep-path">/api/audit/search</span>
+            <span class="ep-summary">Filter by user, action, and date range</span>
+          </div>
+          <div class="ep-badges"><span class="badge badge-purple">admin only</span></div>
+          <i data-lucide="chevron-down" class="ep-chevron icon-sm"></i>
+        </button>
+        <div class="ep-body">
+          <div class="param-table-wrap"><table class="param-table">
+            <thead><tr><th>Param</th><th>Type</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td class="param-name">userId</td><td class="param-type">string?</td><td>Filter by user GUID</td></tr>
+              <tr><td class="param-name">action</td><td class="param-type">string?</td><td>e.g. <code>auth.login</code></td></tr>
+              <tr><td class="param-name">from</td><td class="param-type">DateTime?</td><td>Start of date range (UTC)</td></tr>
+              <tr><td class="param-name">to</td><td class="param-type">DateTime?</td><td>End of date range (UTC)</td></tr>
+              <tr><td class="param-name">limit</td><td class="param-type">int</td><td>Max results (default 100)</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+      </div>
+
+      <div class="ep-item">
+        <button class="ep-toggle">
+          <span class="method method-get">GET</span>
+          <div class="ep-path-wrap">
+            <span class="ep-path">/api/audit/user/{userId}</span>
+            <span class="ep-summary">All events for a specific user</span>
+          </div>
+          <div class="ep-badges"><span class="badge badge-purple">admin only</span></div>
+          <i data-lucide="chevron-down" class="ep-chevron icon-sm"></i>
+        </button>
+        <div class="ep-body"><p>Returns all audit events associated with a specific user GUID, sorted newest first.</p></div>
+      </div>
+
+      <div class="ep-item">
+        <button class="ep-toggle">
+          <span class="method method-get">GET</span>
+          <div class="ep-path-wrap">
+            <span class="ep-path">/api/audit/action/{action}</span>
+            <span class="ep-summary">All events for an action key</span>
+          </div>
+          <div class="ep-badges"><span class="badge badge-purple">admin only</span></div>
+          <i data-lucide="chevron-down" class="ep-chevron icon-sm"></i>
+        </button>
+        <div class="ep-body"><p>Filter by action key, e.g. <code>auth.login</code>, <code>file.upload</code>. Returns matching events sorted newest first.</p></div>
+      </div>
+
+    </div>
+  </div><!-- /tab-audit -->
+
+  <!-- ─────────────────────────────────────────────────────
+       WEBSOCKET TAB
+       ───────────────────────────────────────────────────── -->
+  <div class="tab-panel" id="tab-websocket" role="tabpanel">
+    <div class="panel-header">
+      <div class="panel-header-icon ci-orange"><i data-lucide="zap" class="icon-lg"></i></div>
+      <div class="panel-header-text">
+        <h2>WebSocket</h2>
+        <p>ASP.NET Core SignalR hub at <code>/hubs/chat</code> · JWT-authenticated · automatic reconnect</p>
       </div>
     </div>
 
-    <h2 id="ws-events">WebSocket Events Reference</h2>
-    <h3>Client → Server (invoke)</h3>
-    <div class="param-table-wrap">
-      <table class="param-table">
-        <thead><tr><th>Method</th><th>Arguments</th><th>Description</th></tr></thead>
-        <tbody>
-          <tr><td class="param-name">JoinRoom</td><td><code>roomId</code></td><td>Subscribe to all messages in a room</td></tr>
-          <tr><td class="param-name">LeaveRoom</td><td><code>roomId</code></td><td>Unsubscribe from a room</td></tr>
-          <tr><td class="param-name">Typing</td><td><code>roomId</code></td><td>Broadcast typing indicator (identity from JWT)</td></tr>
-          <tr><td class="param-name">StopTyping</td><td><code>roomId</code></td><td>Stop typing indicator</td></tr>
-          <tr><td class="param-name">Ping</td><td>—</td><td>Test connection; server replies with Pong</td></tr>
-        </tbody>
-      </table>
+    <div class="info-box">
+      <i data-lucide="info" class="icon-sm box-icon"></i>
+      <div class="box-body">
+        <strong>Connect:</strong> <code>ws://localhost:5000/hubs/chat?access_token=YOUR_JWT</code><br/>
+        Presence (UserOnline / UserOffline) is broadcast automatically on connect / disconnect — identity from JWT, no arguments needed.
+      </div>
     </div>
 
-    <h3>Server → Client (on)</h3>
-    <div class="param-table-wrap">
-      <table class="param-table">
-        <thead><tr><th>Event</th><th>Payload</th><th>Description</th></tr></thead>
-        <tbody>
-          <tr><td class="param-name">ReceiveMessage</td><td><code>{ id, roomId, senderId, senderName, content, type, timestamp }</code></td><td>New message in room</td></tr>
-          <tr><td class="param-name">MessageEdited</td><td><code>{ id, content }</code></td><td>Message was edited</td></tr>
-          <tr><td class="param-name">MessageDeleted</td><td><code>{ id, roomId }</code></td><td>Message was soft-deleted</td></tr>
-          <tr><td class="param-name">UserTyping</td><td><code>{ roomId, userId, displayName }</code></td><td>User is typing</td></tr>
-          <tr><td class="param-name">UserStoppedTyping</td><td><code>{ roomId, userId }</code></td><td>User stopped typing</td></tr>
-          <tr><td class="param-name">UserOnline</td><td><code>{ userId, connectedAt }</code></td><td>User connected</td></tr>
-          <tr><td class="param-name">UserOffline</td><td><code>{ userId, disconnectedAt }</code></td><td>User disconnected</td></tr>
-          <tr><td class="param-name">UserJoinedRoom</td><td><code>{ roomId, connectionId, joinedAt }</code></td><td>Someone joined</td></tr>
-          <tr><td class="param-name">UserLeftRoom</td><td><code>{ roomId, connectionId, leftAt }</code></td><td>Someone left</td></tr>
-          <tr><td class="param-name">Pong</td><td><code>{ timestamp }</code></td><td>Reply to Ping</td></tr>
-        </tbody>
-      </table>
-    </div>
+    <div class="ep-list">
 
-    <h2 id="ws-example">WebSocket JS Example</h2>
-    <div class="code-block" id="ws-full" style="position:relative;">
-      <button class="copy-btn">Copy</button>
-<span class="comment">// Install: npm install @microsoft/signalr</span>
+      <div class="ep-item">
+        <button class="ep-toggle">
+          <span class="method method-post" style="min-width:64px">INVOKE</span>
+          <div class="ep-path-wrap">
+            <span class="ep-path">Client → Server methods</span>
+            <span class="ep-summary">What the client calls on the hub</span>
+          </div>
+          <i data-lucide="chevron-down" class="ep-chevron icon-sm"></i>
+        </button>
+        <div class="ep-body">
+          <div class="param-table-wrap"><table class="param-table">
+            <thead><tr><th>Method</th><th>Arguments</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td class="param-name">JoinRoom</td><td><code>roomId</code></td><td>Subscribe to a room's messages</td></tr>
+              <tr><td class="param-name">LeaveRoom</td><td><code>roomId</code></td><td>Unsubscribe from a room</td></tr>
+              <tr><td class="param-name">Typing</td><td><code>roomId</code></td><td>Broadcast typing indicator (identity from JWT)</td></tr>
+              <tr><td class="param-name">StopTyping</td><td><code>roomId</code></td><td>Stop typing indicator</td></tr>
+              <tr><td class="param-name">Ping</td><td>—</td><td>Test connection; server replies with Pong</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+      </div>
+
+      <div class="ep-item">
+        <button class="ep-toggle">
+          <span class="method method-get" style="min-width:64px">ON</span>
+          <div class="ep-path-wrap">
+            <span class="ep-path">Server → Client events</span>
+            <span class="ep-summary">Events the client listens for</span>
+          </div>
+          <i data-lucide="chevron-down" class="ep-chevron icon-sm"></i>
+        </button>
+        <div class="ep-body">
+          <div class="param-table-wrap"><table class="param-table">
+            <thead><tr><th>Event</th><th>Payload</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td class="param-name">ReceiveMessage</td><td><code>{ id, roomId, senderId, senderName, content, type, tags, timestamp }</code></td><td>New message</td></tr>
+              <tr><td class="param-name">MessageEdited</td><td><code>{ id, content }</code></td><td>Message edited</td></tr>
+              <tr><td class="param-name">MessageDeleted</td><td><code>{ id, roomId }</code></td><td>Message soft-deleted</td></tr>
+              <tr><td class="param-name">UserTyping</td><td><code>{ roomId, userId, displayName }</code></td><td>User is typing</td></tr>
+              <tr><td class="param-name">UserStoppedTyping</td><td><code>{ roomId, userId }</code></td><td>Stopped typing</td></tr>
+              <tr><td class="param-name">UserOnline</td><td><code>{ userId, connectedAt }</code></td><td>User connected</td></tr>
+              <tr><td class="param-name">UserOffline</td><td><code>{ userId, disconnectedAt }</code></td><td>User disconnected</td></tr>
+              <tr><td class="param-name">UserJoinedRoom</td><td><code>{ roomId, connectionId, joinedAt }</code></td><td>Someone joined room</td></tr>
+              <tr><td class="param-name">UserLeftRoom</td><td><code>{ roomId, connectionId, leftAt }</code></td><td>Someone left room</td></tr>
+              <tr><td class="param-name">Pong</td><td><code>{ timestamp }</code></td><td>Reply to Ping</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+      </div>
+
+      <div class="ep-item">
+        <button class="ep-toggle">
+          <span class="method method-post" style="min-width:64px">EXAMPLE</span>
+          <div class="ep-path-wrap">
+            <span class="ep-path">JavaScript / TypeScript client</span>
+            <span class="ep-summary">Full connection example using @microsoft/signalr</span>
+          </div>
+          <i data-lucide="chevron-down" class="ep-chevron icon-sm"></i>
+        </button>
+        <div class="ep-body">
+          <div class="code-block" style="position:relative"><button class="copy-btn">Copy</button>
+<span class="comment">// npm install @microsoft/signalr</span>
 <span class="key">import</span> * <span class="key">as</span> signalR <span class="key">from</span> <span class="str">"@microsoft/signalr"</span>;
 
 <span class="key">const</span> conn = <span class="key">new</span> signalR.HubConnectionBuilder()
   .withUrl(<span class="str">"/hubs/chat?access_token=YOUR_JWT"</span>)
   .withAutomaticReconnect()
-  .configureLogging(signalR.LogLevel.Information)
+  .configureLogging(signalR.LogLevel.Warning)
   .build();
 
 conn.on(<span class="str">"ReceiveMessage"</span>, (msg) =&gt; {
-  console.log(<span class="str">`[</span><span class="key">${msg.senderName}</span><span class="str">] </span><span class="key">${msg.content}</span><span class="str">`</span>);
+  console.log(<span class="str">`[${msg.senderName}] ${msg.content}`</span>);
 });
 
 conn.on(<span class="str">"UserTyping"</span>, ({ displayName }) =&gt; {
-  console.log(<span class="str">`</span><span class="key">${displayName}</span><span class="str"> is typing…`</span>);
+  console.log(<span class="str">`${displayName} is typing…`</span>);
+});
+
+conn.on(<span class="str">"UserOnline"</span>, ({ userId }) =&gt; {
+  console.log(<span class="str">`User ${userId} came online`</span>);
 });
 
 <span class="key">await</span> conn.start();
 <span class="key">await</span> conn.invoke(<span class="str">"JoinRoom"</span>, <span class="str">"room-guid-here"</span>);
-<span class="key">await</span> conn.invoke(<span class="str">"Typing"</span>, <span class="str">"room-guid-here"</span>);  <span class="comment">// identity from JWT</span>
-    </div>
-  </main>
+<span class="key">await</span> conn.invoke(<span class="str">"Typing"</span>,   <span class="str">"room-guid-here"</span>);
 </div>
+        </div>
+      </div>
+
+    </div>
+  </div><!-- /tab-websocket -->
+
+</div><!-- /docs-content -->
 
 <footer>
   <p>Chat API v1 &nbsp;·&nbsp; .NET 9 &nbsp;·&nbsp;
