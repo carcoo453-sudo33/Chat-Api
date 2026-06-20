@@ -3,13 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Chat API — Realtime Messaging Platform</title>
+  <title>Chat API — Production-Ready Realtime Chat Backend</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Nunito:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/css/style.css" />
-
-  <!-- Apply saved theme instantly to avoid flash -->
   <script>
     (function(){
       var t=localStorage.getItem('chatapi-theme')||
@@ -31,9 +29,7 @@
 
 <!-- NAV -->
 <nav>
-  <a class="nav-logo" href="/">
-    <div class="dot"></div>Chat API
-  </a>
+  <a class="nav-logo" href="/"><div class="dot"></div>Chat API</a>
   <div class="nav-links">
     <a href="/" class="active">Home</a>
     <a href="/docs.html">Docs</a>
@@ -62,20 +58,17 @@
 
 <!-- HERO -->
 <div class="hero">
-  <div class="hero-tag fade-up">
+  <div class="hero-tag fade-up fade-up-1">
     <i data-lucide="zap" class="icon-sm"></i>
-    Production-Ready Chat API
+    PRODUCTION-READY CHAT API
   </div>
-  <h1 class="fade-up fade-up-1">
-    Realtime Messaging<br />
-    <span id="typewriter" style="color:var(--accent)">Real-time Messaging</span>
-  </h1>
-  <p class="fade-up fade-up-2">
+  <h1 class="fade-up fade-up-2">Realtime Messaging<br>Built for Scale</h1>
+  <p class="fade-up fade-up-3">
     A fully-featured chat backend built on ASP.NET Core 9 with SignalR WebSockets,
     MongoDB persistence, Redis pub/sub, JWT auth, blob file storage, two-tier caching,
     structured audit logging, and hardened security. REST + Realtime in one API.
   </p>
-  <div class="hero-actions fade-up fade-up-3">
+  <div class="hero-actions fade-up fade-up-4">
     <a href="/swagger" class="btn btn-primary">
       <i data-lucide="zap" class="icon-sm"></i> Explore Swagger
     </a>
@@ -85,303 +78,202 @@
   </div>
 </div>
 
-<!-- STATUS -->
-<div style="max-width:1160px;margin:0 auto;padding:0 1.5rem;">
-  <div class="status-bar">
-    <div class="status-item">
-      <div class="status-dot online"></div>
-      <span id="api-status" class="badge badge-green">API Online</span>
-    </div>
-    <div class="status-item">
-      <div class="status-dot online"></div>
-      <span>SignalR Active</span>
-    </div>
-    <div class="status-item">
-      <div class="status-dot standby"></div>
-      <span>MongoDB Ready</span>
-    </div>
-    <div class="status-item">
-      <div class="status-dot standby"></div>
-      <span>Redis Optional</span>
-    </div>
-    <div class="status-item">
-      <div class="status-dot online"></div>
-      <span>JWT Auth</span>
-    </div>
-    <div class="status-item">
-      <div class="status-dot online"></div>
-      <span>File Storage</span>
-    </div>
-    <div class="status-item">
-      <div class="status-dot online"></div>
-      <span>Audit Trail</span>
-    </div>
-    <div class="status-item">
-      <div class="status-dot online"></div>
-      <span>Rate Limiting</span>
-    </div>
-  </div>
+<!-- STATUS BAR -->
+<div class="status-bar">
+  <div class="status-item"><div class="status-dot online"></div><span class="badge badge-orange">API Online</span></div>
+  <div class="status-item"><div class="status-dot online"></div> SignalR Active</div>
+  <div class="status-item"><div class="status-dot standby"></div> MongoDB Ready</div>
+  <div class="status-item"><div class="status-dot standby"></div> Redis Optional</div>
+  <div class="status-item"><div class="status-dot online"></div> JWT Auth</div>
+  <div class="status-item"><div class="status-dot online"></div> File Storage</div>
+  <div class="status-item"><div class="status-dot online"></div> Audit Trail</div>
+  <div class="status-item"><div class="status-dot online"></div> Rate Limiting</div>
 </div>
 
-<!-- STATS -->
-<div style="max-width:1160px;margin:0 auto;padding:0 1.5rem 1rem;">
-  <div class="stats">
-    <div class="stat">
-      <div class="stat-value" data-count="6" data-suffix="">6</div>
-      <div class="stat-label">Resources</div>
+<!-- MAIN CONTENT -->
+<div class="section-wrap">
+  <div class="section-inner">
+
+    <!-- STATS -->
+    <div class="stats reveal">
+      <div class="stat"><div class="stat-value">9</div><div class="stat-label">API Groups</div></div>
+      <div class="stat"><div class="stat-value">30+</div><div class="stat-label">Endpoints</div></div>
+      <div class="stat"><div class="stat-value">10+</div><div class="stat-label">WS Events</div></div>
+      <div class="stat"><div class="stat-value">∞</div><div class="stat-label">Scale Ready</div></div>
     </div>
-    <div class="stat">
-      <div class="stat-value" data-count="28" data-suffix="">28</div>
-      <div class="stat-label">REST Endpoints</div>
+
+    <!-- FEATURES -->
+    <div class="section-header reveal">
+      <h2>Everything You Need</h2>
+      <p>Production-grade features out of the box — no external configuration required</p>
     </div>
-    <div class="stat">
-      <div class="stat-value" data-count="10" data-suffix="">10</div>
-      <div class="stat-label">WS Events</div>
+
+    <div class="grid-3 reveal">
+      <div class="card">
+        <div class="card-icon ci-orange"><i data-lucide="zap" class="icon-lg"></i></div>
+        <h3>SignalR WebSockets</h3>
+        <p>Real-time bidirectional messaging with automatic reconnect, JWT-based presence, typing indicators, and room broadcasting.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon ci-green"><i data-lucide="database" class="icon-lg"></i></div>
+        <h3>MongoDB + In-Memory</h3>
+        <p>Persistent MongoDB storage with automatic in-memory fallback. Works out of the box — zero external dependencies for development.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon ci-purple"><i data-lucide="lock" class="icon-lg"></i></div>
+        <h3>JWT Auth + Refresh</h3>
+        <p>Secure Bearer token auth with server-side refresh token rotation. BCrypt password hashing and role-based access control.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon ci-amber"><i data-lucide="hard-drive" class="icon-lg"></i></div>
+        <h3>File Storage</h3>
+        <p>Local blob storage with UUID filenames, MIME-type validation, 20 MB limit, path-traversal protection, and rate-limited upload.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon ci-orange"><i data-lucide="layers" class="icon-lg"></i></div>
+        <h3>Two-Tier Cache</h3>
+        <p>Redis (L2 distributed) with IMemoryCache (L1 in-process) fallback. Automatic L1 population from L2. Degrades gracefully without Redis.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon ci-green"><i data-lucide="scroll-text" class="icon-lg"></i></div>
+        <h3>Audit Trail</h3>
+        <p>Structured audit log for every auth event, file operation, and admin action. Admin-only query endpoints with full-text search.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon ci-red"><i data-lucide="shield" class="icon-lg"></i></div>
+        <h3>Security Hardening</h3>
+        <p>CSP / HSTS / X-Frame-Options headers, rate limiting, DataAnnotation validation on all DTOs, global exception middleware.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon ci-purple"><i data-lucide="workflow" class="icon-lg"></i></div>
+        <h3>CQRS + MediatR</h3>
+        <p>Clean separation of commands and queries via MediatR. Repository pattern + Unit of Work over MongoDB and in-memory stores.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon ci-amber"><i data-lucide="alert-triangle" class="icon-lg"></i></div>
+        <h3>Global Error Handling</h3>
+        <p>Outermost exception middleware catches everything, logs full context, and returns safe 500 JSON — no stack traces leaked to callers.</p>
+      </div>
     </div>
-    <div class="stat">
-      <div class="stat-value" data-count="9" data-suffix="">9</div>
-      <div class="stat-label">.NET Version</div>
+
+    <!-- TECH STACK -->
+    <div class="section-header reveal" style="margin-top:3.5rem">
+      <h2>Tech Stack</h2>
     </div>
+    <div class="tech-stack reveal">
+      <span class="tech-chip"><span class="chip-dot" style="background:var(--accent)"></span>.NET 9</span>
+      <span class="tech-chip"><span class="chip-dot" style="background:var(--accent4)"></span>ASP.NET Core</span>
+      <span class="tech-chip"><span class="chip-dot" style="background:var(--accent2)"></span>SignalR</span>
+      <span class="tech-chip"><span class="chip-dot" style="background:var(--accent)"></span>MongoDB</span>
+      <span class="tech-chip"><span class="chip-dot" style="background:var(--accent5)"></span>Redis</span>
+      <span class="tech-chip"><span class="chip-dot" style="background:var(--accent4)"></span>MediatR 12</span>
+      <span class="tech-chip"><span class="chip-dot" style="background:var(--accent3)"></span>JWT Bearer</span>
+      <span class="tech-chip"><span class="chip-dot" style="background:var(--accent2)"></span>BCrypt</span>
+      <span class="tech-chip"><span class="chip-dot" style="background:var(--accent)"></span>IMemoryCache</span>
+      <span class="tech-chip"><span class="chip-dot" style="background:var(--accent5)"></span>Rate Limiting</span>
+      <span class="tech-chip"><span class="chip-dot" style="background:var(--accent3)"></span>Security Headers</span>
+      <span class="tech-chip"><span class="chip-dot" style="background:var(--accent2)"></span>Audit Trail</span>
+      <span class="tech-chip"><span class="chip-dot" style="background:var(--accent4)"></span>Swagger / OpenAPI</span>
+    </div>
+
+    <!-- API OVERVIEW -->
+    <div class="section-header reveal" style="margin-top:3.5rem">
+      <h2>API Overview</h2>
+      <p>All routes prefixed with <code>/api</code> · WebSocket hub at <code>/hubs/chat</code></p>
+    </div>
+
+    <div class="grid-2 reveal">
+      <div class="endpoint-group">
+        <div class="endpoint-group-title"><i data-lucide="key-round" class="icon-sm"></i> Auth</div>
+        <div class="endpoint-card">
+          <div class="endpoint-header"><span class="method method-post">POST</span><span class="endpoint-path">/api/auth/register</span></div>
+          <div class="endpoint-body"><p>Register a new account. Returns JWT + refresh token.</p></div>
+        </div>
+        <div class="endpoint-card" style="margin-top:.5rem">
+          <div class="endpoint-header"><span class="method method-post">POST</span><span class="endpoint-path">/api/auth/login</span></div>
+          <div class="endpoint-body"><p>Login and receive access + refresh token pair.</p></div>
+        </div>
+        <div class="endpoint-card" style="margin-top:.5rem">
+          <div class="endpoint-header"><span class="method method-post">POST</span><span class="endpoint-path">/api/auth/refresh</span></div>
+          <div class="endpoint-body"><p>Silently renew access token via refresh token rotation.</p></div>
+        </div>
+      </div>
+
+      <div class="endpoint-group">
+        <div class="endpoint-group-title"><i data-lucide="users" class="icon-sm"></i> Users</div>
+        <div class="endpoint-card">
+          <div class="endpoint-header"><span class="method method-get">GET</span><span class="endpoint-path">/api/users</span></div>
+          <div class="endpoint-body"><p>List all users sorted by display name.</p></div>
+        </div>
+        <div class="endpoint-card" style="margin-top:.5rem">
+          <div class="endpoint-header"><span class="method method-patch">PATCH</span><span class="endpoint-path">/api/users/{id}</span></div>
+          <div class="endpoint-body"><p>Partially update a user profile.</p></div>
+        </div>
+        <div class="endpoint-card" style="margin-top:.5rem">
+          <div class="endpoint-header"><span class="method method-post">POST</span><span class="endpoint-path">/api/users/{id}/status</span></div>
+          <div class="endpoint-body"><p>Set online/away/offline — broadcasts via WebSocket.</p></div>
+        </div>
+      </div>
+
+      <div class="endpoint-group">
+        <div class="endpoint-group-title"><i data-lucide="message-square" class="icon-sm"></i> Rooms</div>
+        <div class="endpoint-card">
+          <div class="endpoint-header"><span class="method method-get">GET</span><span class="endpoint-path">/api/rooms</span></div>
+          <div class="endpoint-body"><p>All rooms sorted by latest activity.</p></div>
+        </div>
+        <div class="endpoint-card" style="margin-top:.5rem">
+          <div class="endpoint-header"><span class="method method-post">POST</span><span class="endpoint-path">/api/rooms</span></div>
+          <div class="endpoint-body"><p>Create a Direct / Group / Channel room with auto-slug.</p></div>
+        </div>
+        <div class="endpoint-card" style="margin-top:.5rem">
+          <div class="endpoint-header"><span class="method method-delete">DELETE</span><span class="endpoint-path">/api/rooms/{id}/members/{userId}</span></div>
+          <div class="endpoint-body"><p>Remove a member from a room.</p></div>
+        </div>
+      </div>
+
+      <div class="endpoint-group">
+        <div class="endpoint-group-title"><i data-lucide="mail" class="icon-sm"></i> Messages</div>
+        <div class="endpoint-card">
+          <div class="endpoint-header"><span class="method method-get">GET</span><span class="endpoint-path">/api/messages/room/{roomId}</span></div>
+          <div class="endpoint-body"><p>Paginated history — oldest → newest.</p></div>
+        </div>
+        <div class="endpoint-card" style="margin-top:.5rem">
+          <div class="endpoint-header"><span class="method method-post">POST</span><span class="endpoint-path">/api/messages</span></div>
+          <div class="endpoint-body"><p>Send a message; auto-broadcasts via SignalR.</p></div>
+        </div>
+        <div class="endpoint-card" style="margin-top:.5rem">
+          <div class="endpoint-header"><span class="method method-delete">DELETE</span><span class="endpoint-path">/api/messages/{id}</span></div>
+          <div class="endpoint-body"><p>Soft-delete — content replaced, history preserved.</p></div>
+        </div>
+      </div>
+
+      <div class="endpoint-group">
+        <div class="endpoint-group-title"><i data-lucide="upload" class="icon-sm"></i> Files</div>
+        <div class="endpoint-card">
+          <div class="endpoint-header"><span class="method method-post">POST</span><span class="endpoint-path">/api/files/upload</span></div>
+          <div class="endpoint-body"><p>Upload file (multipart, max 20 MB). Sandboxed storage.</p></div>
+        </div>
+        <div class="endpoint-card" style="margin-top:.5rem">
+          <div class="endpoint-header"><span class="method method-delete">DELETE</span><span class="endpoint-path">/api/files/{fileName}</span></div>
+          <div class="endpoint-body"><p>Delete a file — path-traversal safe, rate limited.</p></div>
+        </div>
+      </div>
+
+      <div class="endpoint-group">
+        <div class="endpoint-group-title"><i data-lucide="scroll-text" class="icon-sm"></i> Audit</div>
+        <div class="endpoint-card">
+          <div class="endpoint-header"><span class="method method-get">GET</span><span class="endpoint-path">/api/audit/recent</span></div>
+          <div class="endpoint-body"><p>Latest N audit events. Admin only.</p></div>
+        </div>
+        <div class="endpoint-card" style="margin-top:.5rem">
+          <div class="endpoint-header"><span class="method method-get">GET</span><span class="endpoint-path">/api/audit/search</span></div>
+          <div class="endpoint-body"><p>Filter by user, action, date range. Admin only.</p></div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
-
-<!-- FEATURES -->
-<section>
-  <div class="section-header">
-    <h2>Everything you need for chat</h2>
-    <p>Built with modern patterns — no compromises on scalability or DX</p>
-  </div>
-  <div class="grid-3">
-    <div class="card">
-      <div class="card-icon ci-blue"><i data-lucide="zap" class="icon-lg"></i></div>
-      <h3>SignalR WebSockets</h3>
-      <p>Real-time bidirectional communication via SignalR Hub. Automatic fallback to long-polling. Room groups, typing indicators, online presence.</p>
-    </div>
-    <div class="card">
-      <div class="card-icon ci-purple"><i data-lucide="lock" class="icon-lg"></i></div>
-      <h3>JWT Authentication</h3>
-      <p>Full identity system with register, login, refresh tokens, role-based access, and password hashing via BCrypt. Secure by default.</p>
-    </div>
-    <div class="card">
-      <div class="card-icon ci-green"><i data-lucide="leaf" class="icon-lg"></i></div>
-      <h3>MongoDB Ready</h3>
-      <p>MongoDB.Driver with typed collections. Runs in-memory when no URI is set — zero configuration needed for local development.</p>
-    </div>
-    <div class="card">
-      <div class="card-icon ci-red"><i data-lucide="database" class="icon-lg"></i></div>
-      <h3>Two-Tier Cache</h3>
-      <p>Redis L2 cache with automatic IMemoryCache L1 fallback. Configurable TTL per key. Prefix-based invalidation. Zero downtime when Redis is absent.</p>
-    </div>
-    <div class="card">
-      <div class="card-icon ci-orange"><i data-lucide="paperclip" class="icon-lg"></i></div>
-      <h3>Blob File Uploads</h3>
-      <p>Upload images, documents, and media up to 20 MB. Path-traversal–proof deletion. Extension allowlist. Files auto-attach to room messages.</p>
-    </div>
-    <div class="card">
-      <div class="card-icon ci-blue"><i data-lucide="book-open" class="icon-lg"></i></div>
-      <h3>Full Swagger UI</h3>
-      <p>Every endpoint documented with examples, request/response schemas, and live try-it-out. Custom dark theme included.</p>
-    </div>
-    <div class="card">
-      <div class="card-icon ci-purple"><i data-lucide="shield" class="icon-lg"></i></div>
-      <h3>Security Hardening</h3>
-      <p>CSP, HSTS, X-Frame-Options, Referrer-Policy headers. Fixed-window rate limiting on auth (10/min) and uploads (20/min). Input validation via DataAnnotations.</p>
-    </div>
-    <div class="card">
-      <div class="card-icon ci-green"><i data-lucide="file-text" class="icon-lg"></i></div>
-      <h3>Audit Trail</h3>
-      <p>Every auth event, file operation, and room mutation is written to a structured audit log with user ID, IP address, action, resource, and timestamp.</p>
-    </div>
-    <div class="card">
-      <div class="card-icon ci-orange"><i data-lucide="alert-triangle" class="icon-lg"></i></div>
-      <h3>Global Error Handling</h3>
-      <p>Centralised exception middleware logs every unhandled error with method, path, user, and IP. Callers always receive a safe, consistent JSON response.</p>
-    </div>
-  </div>
-</section>
-
-<!-- API OVERVIEW GRID -->
-<div style="background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
-  <section>
-    <div class="section-header">
-      <h2>API Endpoints at a glance</h2>
-      <p>REST + WebSocket — everything in one place</p>
-    </div>
-
-    <!-- AUTH -->
-    <div class="endpoint-group">
-      <div class="endpoint-group-title">
-        <i data-lucide="lock" class="icon-md" style="color:var(--accent4)"></i>
-        Auth <span class="badge badge-purple" style="font-size:.68rem">6 endpoints</span>
-      </div>
-      <div class="grid-2">
-        <div class="endpoint-card"><div class="endpoint-header"><span class="method method-post">POST</span><span class="endpoint-path">/api/auth/register</span></div><div class="endpoint-body"><p>Register a new account, get JWT tokens</p></div></div>
-        <div class="endpoint-card"><div class="endpoint-header"><span class="method method-post">POST</span><span class="endpoint-path">/api/auth/login</span></div><div class="endpoint-body"><p>Login, returns access + refresh token</p></div></div>
-        <div class="endpoint-card"><div class="endpoint-header"><span class="method method-post">POST</span><span class="endpoint-path">/api/auth/refresh</span></div><div class="endpoint-body"><p>Exchange refresh token for new access token</p></div></div>
-        <div class="endpoint-card"><div class="endpoint-header"><span class="method method-get">GET</span><span class="endpoint-path">/api/auth/me</span></div><div class="endpoint-body"><p>Get current user profile from JWT</p></div></div>
-        <div class="endpoint-card"><div class="endpoint-header"><span class="method method-post">POST</span><span class="endpoint-path">/api/auth/logout</span></div><div class="endpoint-body"><p>Revoke refresh token, set offline</p></div></div>
-        <div class="endpoint-card"><div class="endpoint-header"><span class="method method-post">POST</span><span class="endpoint-path">/api/auth/change-password</span></div><div class="endpoint-body"><p>Change password, revoke all sessions</p></div></div>
-      </div>
-    </div>
-
-    <!-- USERS -->
-    <div class="endpoint-group">
-      <div class="endpoint-group-title">
-        <i data-lucide="user" class="icon-md" style="color:var(--accent)"></i>
-        Users <span class="badge badge-blue" style="font-size:.68rem">6 endpoints</span>
-      </div>
-      <div class="grid-2">
-        <div class="endpoint-card"><div class="endpoint-header"><span class="method method-get">GET</span><span class="endpoint-path">/api/users</span></div><div class="endpoint-body"><p>List all users with online status</p></div></div>
-        <div class="endpoint-card"><div class="endpoint-header"><span class="method method-get">GET</span><span class="endpoint-path">/api/users/{id}</span></div><div class="endpoint-body"><p>Get user by ID</p></div></div>
-        <div class="endpoint-card"><div class="endpoint-header"><span class="method method-post">POST</span><span class="endpoint-path">/api/users</span></div><div class="endpoint-body"><p>Create a new user account</p></div></div>
-        <div class="endpoint-card"><div class="endpoint-header"><span class="method method-patch">PATCH</span><span class="endpoint-path">/api/users/{id}</span></div><div class="endpoint-body"><p>Update display name or avatar</p></div></div>
-        <div class="endpoint-card"><div class="endpoint-header"><span class="method method-post">POST</span><span class="endpoint-path">/api/users/{id}/status</span></div><div class="endpoint-body"><p>Set online / offline status</p></div></div>
-        <div class="endpoint-card"><div class="endpoint-header"><span class="method method-delete">DELETE</span><span class="endpoint-path">/api/users/{id}</span></div><div class="endpoint-body"><p>Delete a user account (admin)</p></div></div>
-      </div>
-    </div>
-
-    <!-- ROOMS -->
-    <div class="endpoint-group">
-      <div class="endpoint-group-title">
-        <i data-lucide="message-square" class="icon-md" style="color:var(--accent2)"></i>
-        Rooms <span class="badge badge-green" style="font-size:.68rem">6 endpoints</span>
-      </div>
-      <div class="grid-2">
-        <div class="endpoint-card"><div class="endpoint-header"><span class="method method-get">GET</span><span class="endpoint-path">/api/rooms</span></div><div class="endpoint-body"><p>List all chat rooms</p></div></div>
-        <div class="endpoint-card"><div class="endpoint-header"><span class="method method-post">POST</span><span class="endpoint-path">/api/rooms</span></div><div class="endpoint-body"><p>Create a room (Direct / Group / Channel)</p></div></div>
-        <div class="endpoint-card"><div class="endpoint-header"><span class="method method-get">GET</span><span class="endpoint-path">/api/rooms/user/{userId}</span></div><div class="endpoint-body"><p>Get all rooms a user belongs to</p></div></div>
-        <div class="endpoint-card"><div class="endpoint-header"><span class="method method-get">GET</span><span class="endpoint-path">/api/rooms/{id}</span></div><div class="endpoint-body"><p>Get single room details</p></div></div>
-        <div class="endpoint-card"><div class="endpoint-header"><span class="method method-post">POST</span><span class="endpoint-path">/api/rooms/{id}/members</span></div><div class="endpoint-body"><p>Add a member to a room</p></div></div>
-        <div class="endpoint-card"><div class="endpoint-header"><span class="method method-delete">DELETE</span><span class="endpoint-path">/api/rooms/{id}/members/{uid}</span></div><div class="endpoint-body"><p>Remove a member from a room</p></div></div>
-      </div>
-    </div>
-
-    <!-- MESSAGES -->
-    <div class="endpoint-group">
-      <div class="endpoint-group-title">
-        <i data-lucide="mail" class="icon-md" style="color:var(--accent5)"></i>
-        Messages <span class="badge badge-orange" style="font-size:.68rem">6 endpoints</span>
-      </div>
-      <div class="grid-2">
-        <div class="endpoint-card"><div class="endpoint-header"><span class="method method-get">GET</span><span class="endpoint-path">/api/messages/room/{roomId}</span></div><div class="endpoint-body"><p>Paginated message history for a room</p></div></div>
-        <div class="endpoint-card"><div class="endpoint-header"><span class="method method-post">POST</span><span class="endpoint-path">/api/messages</span></div><div class="endpoint-body"><p>Send a message — broadcasts via WebSocket</p></div></div>
-        <div class="endpoint-card"><div class="endpoint-header"><span class="method method-patch">PATCH</span><span class="endpoint-path">/api/messages/{id}</span></div><div class="endpoint-body"><p>Edit message content</p></div></div>
-        <div class="endpoint-card"><div class="endpoint-header"><span class="method method-delete">DELETE</span><span class="endpoint-path">/api/messages/{id}</span></div><div class="endpoint-body"><p>Soft-delete a message</p></div></div>
-        <div class="endpoint-card"><div class="endpoint-header"><span class="method method-post">POST</span><span class="endpoint-path">/api/messages/{id}/read</span></div><div class="endpoint-body"><p>Mark a message as read</p></div></div>
-        <div class="endpoint-card"><div class="endpoint-header"><span class="method method-get">GET</span><span class="endpoint-path">/api/messages/room/{id}/unread</span></div><div class="endpoint-body"><p>Get unread count for a room</p></div></div>
-      </div>
-    </div>
-
-    <!-- FILES -->
-    <div class="endpoint-group">
-      <div class="endpoint-group-title">
-        <i data-lucide="paperclip" class="icon-md" style="color:var(--accent4)"></i>
-        Files <span class="badge badge-purple" style="font-size:.68rem">2 endpoints</span>
-      </div>
-      <div class="grid-2">
-        <div class="endpoint-card"><div class="endpoint-header"><span class="method method-post">POST</span><span class="endpoint-path">/api/files/upload</span></div><div class="endpoint-body"><p>Upload file (up to 20 MB). Extension allowlist. Optionally attach to a room.</p></div></div>
-        <div class="endpoint-card"><div class="endpoint-header"><span class="method method-delete">DELETE</span><span class="endpoint-path">/api/files/{fileName}</span></div><div class="endpoint-body"><p>Delete file. Path-traversal–proof — bare filename only accepted.</p></div></div>
-      </div>
-    </div>
-
-    <!-- AUDIT -->
-    <div class="endpoint-group">
-      <div class="endpoint-group-title">
-        <i data-lucide="shield" class="icon-md" style="color:var(--accent2)"></i>
-        Audit <span class="badge badge-green" style="font-size:.68rem">4 endpoints · Admin only</span>
-      </div>
-      <div class="grid-2">
-        <div class="endpoint-card"><div class="endpoint-header"><span class="method method-get">GET</span><span class="endpoint-path">/api/audit</span></div><div class="endpoint-body"><p>Recent audit events (max 500). Returns action, userId, IP, resource, timestamp.</p></div></div>
-        <div class="endpoint-card"><div class="endpoint-header"><span class="method method-get">GET</span><span class="endpoint-path">/api/audit/search</span></div><div class="endpoint-body"><p>Filter by userId, action prefix, and/or date range.</p></div></div>
-        <div class="endpoint-card"><div class="endpoint-header"><span class="method method-get">GET</span><span class="endpoint-path">/api/audit/user/{userId}</span></div><div class="endpoint-body"><p>All audit events for a specific user.</p></div></div>
-        <div class="endpoint-card"><div class="endpoint-header"><span class="method method-get">GET</span><span class="endpoint-path">/api/audit/action/{action}</span></div><div class="endpoint-body"><p>All events matching an action prefix, e.g. "auth", "file.delete".</p></div></div>
-      </div>
-    </div>
-  </section>
-</div>
-
-<!-- WEBSOCKET -->
-<section>
-  <div class="section-header">
-    <h2><i data-lucide="wifi" class="icon-lg" style="color:var(--accent);vertical-align:middle;margin-right:6px"></i>WebSocket — SignalR Hub</h2>
-    <p>Connect to <code>/hubs/chat</code> for realtime events</p>
-  </div>
-  <div class="grid-2">
-    <div>
-      <div class="ws-label">
-        <i data-lucide="upload" class="icon-sm"></i>
-        Client → Server (invoke)
-      </div>
-      <div class="ws-demo">
-        <div class="ws-line"><span class="ws-dir-out">JoinRoom</span><span class="ws-key">(roomId)</span></div>
-        <div class="ws-line"><span class="ws-dir-out">LeaveRoom</span><span class="ws-key">(roomId)</span></div>
-        <div class="ws-line"><span class="ws-dir-out">Typing</span><span class="ws-key">(roomId) &nbsp;<span style="color:var(--accent4);font-size:.75rem">identity from JWT</span></span></div>
-        <div class="ws-line"><span class="ws-dir-out">StopTyping</span><span class="ws-key">(roomId)</span></div>
-        <div class="ws-line"><span class="ws-dir-out">Ping</span><span class="ws-key">() → Pong</span></div>
-      </div>
-    </div>
-    <div>
-      <div class="ws-label">
-        <i data-lucide="download" class="icon-sm"></i>
-        Server → Client (on)
-      </div>
-      <div class="ws-demo">
-        <div class="ws-line"><span class="ws-dir-in">ReceiveMessage</span><span class="ws-key">{ id, roomId, content, … }</span></div>
-        <div class="ws-line"><span class="ws-dir-in">MessageEdited</span><span class="ws-key">{ id, content }</span></div>
-        <div class="ws-line"><span class="ws-dir-in">MessageDeleted</span><span class="ws-key">{ id, roomId }</span></div>
-        <div class="ws-line"><span class="ws-dir-in">UserTyping</span><span class="ws-key">{ roomId, userId, displayName }</span></div>
-        <div class="ws-line"><span class="ws-dir-in">UserOnline</span><span class="ws-key">{ userId }</span></div>
-        <div class="ws-line"><span class="ws-dir-in">UserOffline</span><span class="ws-key">{ userId }</span></div>
-        <div class="ws-line"><span class="ws-dir-in">UserJoinedRoom</span><span class="ws-key">{ roomId }</span></div>
-        <div class="ws-line"><span class="ws-dir-in">Pong</span><span class="ws-key">{ timestamp }</span></div>
-      </div>
-    </div>
-  </div>
-  <div style="margin-top:1.5rem;">
-    <div class="ws-label" style="margin-bottom:.75rem;">
-      <i data-lucide="terminal" class="icon-sm"></i> Quick connect (JavaScript)
-    </div>
-    <div class="code-block" id="ws-snippet" style="position:relative;">
-      <button class="copy-btn">Copy</button>
-<span class="comment">// npm install @microsoft/signalr</span>
-<span class="key">import</span> * as signalR <span class="key">from</span> <span class="str">"@microsoft/signalr"</span>;
-
-<span class="key">const</span> connection = <span class="key">new</span> signalR.HubConnectionBuilder()
-  .withUrl(<span class="str">"/hubs/chat?access_token=YOUR_JWT"</span>)
-  .withAutomaticReconnect()
-  .build();
-
-connection.on(<span class="str">"ReceiveMessage"</span>, (msg) =&gt; {
-  console.log(<span class="str">`[</span><span class="key">${msg.senderName}</span><span class="str">]:`</span>, msg.content);
-});
-
-<span class="key">await</span> connection.start();
-<span class="key">await</span> connection.invoke(<span class="str">"JoinRoom"</span>, <span class="str">"room_001"</span>);
-    </div>
-  </div>
-</section>
-
-<!-- TECH STACK -->
-<section style="text-align:center;padding-bottom:4rem;">
-  <div class="section-header">
-    <h2>Tech Stack</h2>
-    <p>Modern, production-tested technologies</p>
-  </div>
-  <div class="tech-stack">
-    <div class="tech-chip"><div class="chip-dot" style="background:#7b68ee"></div>.NET 9 ASP.NET Core</div>
-    <div class="tech-chip"><div class="chip-dot" style="background:#58a6ff"></div>SignalR WebSockets</div>
-    <div class="tech-chip"><div class="chip-dot" style="background:#ffa657"></div>JWT Bearer Auth</div>
-    <div class="tech-chip"><div class="chip-dot" style="background:#3fb950"></div>MongoDB Driver 3.x</div>
-    <div class="tech-chip"><div class="chip-dot" style="background:#f78166"></div>StackExchange.Redis</div>
-    <div class="tech-chip"><div class="chip-dot" style="background:#d2a8ff"></div>IMemoryCache L1</div>
-    <div class="tech-chip"><div class="chip-dot" style="background:#d2a8ff"></div>BCrypt Password Hash</div>
-    <div class="tech-chip"><div class="chip-dot" style="background:#79b8ff"></div>Blob File Storage</div>
-    <div class="tech-chip"><div class="chip-dot" style="background:#85e89d"></div>Swashbuckle Swagger</div>
-    <div class="tech-chip"><div class="chip-dot" style="background:#e05252"></div>Rate Limiting</div>
-    <div class="tech-chip"><div class="chip-dot" style="background:#ffa657"></div>Security Headers</div>
-    <div class="tech-chip"><div class="chip-dot" style="background:#58a6ff"></div>Audit Trail</div>
-  </div>
-</section>
 
 <footer>
   <p>Chat API v1 &nbsp;·&nbsp; .NET 9 &nbsp;·&nbsp;
@@ -392,7 +284,6 @@ connection.on(<span class="str">"ReceiveMessage"</span>, (msg) =&gt; {
   </p>
 </footer>
 
-<!-- Lucide icons (deferred) -->
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
 <script src="/js/main.js" defer></script>
 </body>

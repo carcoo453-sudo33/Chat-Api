@@ -6,10 +6,8 @@
   <title>Chat API — Documentation</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Nunito:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/css/style.css" />
-
-  <!-- Apply saved theme instantly to avoid flash -->
   <script>
     (function(){
       var t=localStorage.getItem('chatapi-theme')||
@@ -31,9 +29,7 @@
 
 <!-- NAV -->
 <nav>
-  <a class="nav-logo" href="/">
-    <div class="dot"></div>Chat API
-  </a>
+  <a class="nav-logo" href="/"><div class="dot"></div>Chat API</a>
   <div class="nav-links">
     <a href="/">Home</a>
     <a href="/docs.html" class="active">Docs</a>
@@ -60,15 +56,17 @@
   <a href="/health"><i data-lucide="activity" class="icon-md"></i> Health</a>
   <div class="mobile-menu-sep"></div>
   <a href="#overview">Overview</a>
-  <a href="#auth">Authentication</a>
+  <a href="#authentication">Authentication</a>
+  <a href="#auth-register">Auth</a>
   <a href="#users-list">Users</a>
   <a href="#rooms-list">Rooms</a>
   <a href="#msg-history">Messages</a>
   <a href="#files-upload">Files</a>
+  <a href="#audit-recent">Audit</a>
   <a href="#ws-connect">WebSocket</a>
 </div>
 
-<!-- SIDEBAR TOGGLE (floating) -->
+<!-- SIDEBAR TOGGLE -->
 <button class="sidebar-toggle" id="sidebar-toggle" title="Toggle sidebar">
   <span class="st-hide"><i data-lucide="chevron-left" class="icon-md"></i></span>
   <span class="st-show"><i data-lucide="chevron-right" class="icon-md"></i></span>
@@ -128,6 +126,12 @@
     <a href="#files-upload">Upload File</a>
     <a href="#files-delete">Delete File</a>
 
+    <h4>Audit</h4>
+    <a href="#audit-recent">Recent Events</a>
+    <a href="#audit-search">Search</a>
+    <a href="#audit-by-user">By User</a>
+    <a href="#audit-by-action">By Action</a>
+
     <h4>WebSocket</h4>
     <a href="#ws-connect">Connect</a>
     <a href="#ws-events">Events Reference</a>
@@ -138,7 +142,7 @@
   <main class="docs-main">
     <div class="hero-tag" style="margin-bottom:.85rem">API Reference v1</div>
     <h1>Chat API Documentation</h1>
-    <p>A realtime chat backend with REST endpoints and WebSocket (SignalR) events. All responses follow a standard envelope format.</p>
+    <p>A realtime chat backend with REST endpoints and WebSocket (SignalR) events. All responses follow a standard envelope format. All entity IDs are GUIDs.</p>
 
     <!-- OVERVIEW -->
     <h2 id="overview">Overview</h2>
@@ -149,7 +153,7 @@
         <p style="font-size:.76rem">JWT + refresh</p>
       </div>
       <div class="card mini-card">
-        <div class="card-icon ci-blue"><i data-lucide="user" class="icon-lg"></i></div>
+        <div class="card-icon ci-orange"><i data-lucide="user" class="icon-lg"></i></div>
         <h3 style="font-size:.82rem">Users</h3>
         <p style="font-size:.76rem">Profiles, presence</p>
       </div>
@@ -159,9 +163,29 @@
         <p style="font-size:.76rem">Groups, channels</p>
       </div>
       <div class="card mini-card">
-        <div class="card-icon ci-orange"><i data-lucide="mail" class="icon-lg"></i></div>
+        <div class="card-icon ci-amber"><i data-lucide="mail" class="icon-lg"></i></div>
         <h3 style="font-size:.82rem">Messages</h3>
         <p style="font-size:.76rem">Send, edit, delete</p>
+      </div>
+      <div class="card mini-card">
+        <div class="card-icon ci-orange"><i data-lucide="upload" class="icon-lg"></i></div>
+        <h3 style="font-size:.82rem">Files</h3>
+        <p style="font-size:.76rem">Blob storage</p>
+      </div>
+      <div class="card mini-card">
+        <div class="card-icon ci-red"><i data-lucide="scroll-text" class="icon-lg"></i></div>
+        <h3 style="font-size:.82rem">Audit</h3>
+        <p style="font-size:.76rem">Event log</p>
+      </div>
+      <div class="card mini-card">
+        <div class="card-icon ci-green"><i data-lucide="zap" class="icon-lg"></i></div>
+        <h3 style="font-size:.82rem">WebSocket</h3>
+        <p style="font-size:.76rem">SignalR realtime</p>
+      </div>
+      <div class="card mini-card">
+        <div class="card-icon ci-amber"><i data-lucide="shield" class="icon-lg"></i></div>
+        <h3 style="font-size:.82rem">Security</h3>
+        <p style="font-size:.76rem">Hardened API</p>
       </div>
     </div>
 
@@ -187,6 +211,13 @@
         <code>alice / password123</code> (admin) &nbsp;·&nbsp; <code>bob / password123</code> &nbsp;·&nbsp; <code>carla / password123</code>
       </div>
     </div>
+    <div class="warn-box">
+      <i data-lucide="shield" class="icon-sm box-icon"></i>
+      <div class="box-body">
+        <strong>Rate limiting:</strong> Auth endpoints are limited to <strong>10 requests/min</strong> per IP.
+        File upload is limited to <strong>20 requests/min</strong>. Global limit is <strong>120 requests/min</strong>.
+      </div>
+    </div>
 
     <!-- RESPONSE FORMAT -->
     <h2 id="response-format">Response Format</h2>
@@ -208,13 +239,14 @@
         <thead><tr><th>Status</th><th>Meaning</th></tr></thead>
         <tbody>
           <tr><td><span class="badge badge-green">200</span></td><td>OK — success</td></tr>
-          <tr><td><span class="badge badge-blue">201</span></td><td>Created — resource created</td></tr>
+          <tr><td><span class="badge badge-green">201</span></td><td>Created — resource created</td></tr>
           <tr><td><span class="badge badge-orange">400</span></td><td>Bad Request — validation failed</td></tr>
           <tr><td><span class="badge badge-orange">401</span></td><td>Unauthorized — missing or invalid JWT</td></tr>
           <tr><td><span class="badge badge-orange">403</span></td><td>Forbidden — insufficient role</td></tr>
           <tr><td><span class="badge badge-orange">404</span></td><td>Not Found — resource missing</td></tr>
           <tr><td><span class="badge badge-purple">409</span></td><td>Conflict — duplicate resource</td></tr>
-          <tr><td><span class="badge" style="background:rgba(247,129,102,.15);color:#f78166;border:1px solid rgba(247,129,102,.3)">500</span></td><td>Server Error — unexpected failure</td></tr>
+          <tr><td><span class="badge badge-orange">429</span></td><td>Too Many Requests — rate limit exceeded</td></tr>
+          <tr><td><span class="badge badge-red">500</span></td><td>Server Error — unexpected failure (safe message only)</td></tr>
         </tbody>
       </table>
     </div>
@@ -244,37 +276,37 @@
     </div>
 
     <h2 id="auth-refresh">POST /api/auth/refresh</h2>
-    <p>Exchange a valid refresh token for a new access token. Old refresh token is revoked.</p>
+    <p>Exchange a valid refresh token for a new access token. Old refresh token is revoked (rotation).</p>
     <div class="code-block" style="position:relative;"><button class="copy-btn">Copy</button>
 { <span class="key">"refreshToken"</span>: <span class="str">"abc123..."</span> }
     </div>
 
     <h2 id="auth-me">GET /api/auth/me</h2>
-    <p>Returns the currently authenticated user's profile decoded from the JWT. <span class="badge badge-blue">requires auth</span></p>
+    <p>Returns the currently authenticated user's profile decoded from the JWT. <span class="badge badge-orange">requires auth</span></p>
 
     <h2 id="auth-logout">POST /api/auth/logout</h2>
-    <p>Revokes the provided refresh token server-side and sets the user offline. <span class="badge badge-blue">requires auth</span></p>
+    <p>Revokes the provided refresh token server-side and sets the user offline. <span class="badge badge-orange">requires auth</span></p>
     <div class="code-block">{ <span class="key">"refreshToken"</span>: <span class="str">"abc123..."</span> }</div>
 
     <h2 id="auth-password">POST /api/auth/change-password</h2>
-    <p>Change password for the currently authenticated user. All existing sessions are revoked. <span class="badge badge-blue">requires auth</span></p>
+    <p>Change password for the currently authenticated user. All existing sessions are revoked. <span class="badge badge-orange">requires auth</span></p>
     <div class="code-block">
 { <span class="key">"currentPassword"</span>: <span class="str">"old"</span>, <span class="key">"newPassword"</span>: <span class="str">"new"</span>, <span class="key">"confirmPassword"</span>: <span class="str">"new"</span> }
     </div>
 
     <!-- ═══ USERS ═══ -->
     <h2 id="users-list">GET /api/users</h2>
-    <p>Returns all registered users sorted by display name. <span class="badge badge-blue">requires auth</span></p>
+    <p>Returns all registered users sorted by display name. <span class="badge badge-orange">requires auth</span></p>
     <div class="response-block">
       <div class="response-label">Response 200</div>
-      <div class="code-block">{ <span class="key">"success"</span>: <span class="num">true</span>, <span class="key">"data"</span>: [ { <span class="key">"id"</span>:<span class="str">"user_001"</span>, <span class="key">"username"</span>:<span class="str">"alice"</span>, <span class="key">"isOnline"</span>:<span class="num">true</span> } ], <span class="key">"total"</span>: <span class="num">3</span> }</div>
+      <div class="code-block">{ <span class="key">"success"</span>: <span class="num">true</span>, <span class="key">"data"</span>: [ { <span class="key">"id"</span>:<span class="str">"550e8400-e29b-41d4..."</span>, <span class="key">"username"</span>:<span class="str">"alice"</span>, <span class="key">"isOnline"</span>:<span class="num">true</span> } ], <span class="key">"total"</span>: <span class="num">3</span> }</div>
     </div>
 
     <h2 id="users-get">GET /api/users/{id}</h2>
-    <p>Fetch a single user by their ID. <span class="badge badge-blue">requires auth</span></p>
+    <p>Fetch a single user by their GUID. <span class="badge badge-orange">requires auth</span></p>
 
     <h2 id="users-create">POST /api/users</h2>
-    <p>Create a new user. Usernames must be unique. <span class="badge badge-blue">requires auth</span></p>
+    <p>Create a new user. Usernames must be unique. Returns the new user with a generated GUID. <span class="badge badge-orange">requires auth</span></p>
     <div class="code-block" style="position:relative;"><button class="copy-btn">Copy</button>
 {
   <span class="key">"username"</span>:    <span class="str">"john_doe"</span>,
@@ -284,47 +316,47 @@
     </div>
 
     <h2 id="users-update">PATCH /api/users/{id}</h2>
-    <p>Partially update a user profile. <span class="badge badge-blue">requires auth</span></p>
+    <p>Partially update a user profile. <span class="badge badge-orange">requires auth</span></p>
     <div class="code-block">{ <span class="key">"displayName"</span>: <span class="str">"Johnny"</span>, <span class="key">"avatarUrl"</span>: <span class="str">"https://..."</span> }</div>
 
     <h2 id="users-status">POST /api/users/{id}/status</h2>
-    <p>Set online/offline status. Also broadcasts <code>UserOnline</code> / <code>UserOffline</code> via WebSocket. <span class="badge badge-blue">requires auth</span></p>
+    <p>Set online/offline/away status. Also broadcasts <code>UserOnline</code> / <code>UserOffline</code> via WebSocket. <span class="badge badge-orange">requires auth</span></p>
     <div class="code-block">{ <span class="key">"isOnline"</span>: <span class="num">true</span> }</div>
 
     <h2 id="users-delete">DELETE /api/users/{id}</h2>
-    <p>Permanently removes a user record. <span class="badge badge-purple">admin only</span></p>
+    <p>Soft-deletes a user record (preserves history). <span class="badge badge-purple">admin only</span></p>
 
     <!-- ═══ ROOMS ═══ -->
     <h2 id="rooms-list">GET /api/rooms</h2>
-    <p>Returns all rooms sorted by latest message activity. <span class="badge badge-blue">requires auth</span></p>
+    <p>Returns all active (non-deleted) rooms sorted by latest message activity. <span class="badge badge-orange">requires auth</span></p>
 
     <h2 id="rooms-by-user">GET /api/rooms/user/{userId}</h2>
-    <p>Returns only the rooms that include the given user as a member. <span class="badge badge-blue">requires auth</span></p>
+    <p>Returns only the rooms that include the given user as a member. <span class="badge badge-orange">requires auth</span></p>
 
     <h2 id="rooms-get">GET /api/rooms/{id}</h2>
-    <p>Fetch a single room with member IDs and last-message preview. <span class="badge badge-blue">requires auth</span></p>
+    <p>Fetch a single room with member IDs and last-message preview. <span class="badge badge-orange">requires auth</span></p>
 
     <h2 id="rooms-create">POST /api/rooms</h2>
-    <p>Create a new room. <code>type</code>: <code>0</code> = Direct, <code>1</code> = Group, <code>2</code> = Channel. <span class="badge badge-blue">requires auth</span></p>
+    <p>Create a new room. A URL-safe <code>slug</code> is auto-generated from the name via SlugHelper. <code>type</code>: <code>0</code> = Direct, <code>1</code> = Group, <code>2</code> = Channel. <span class="badge badge-orange">requires auth</span></p>
     <div class="code-block" style="position:relative;"><button class="copy-btn">Copy</button>
 {
   <span class="key">"name"</span>:       <span class="str">"engineering"</span>,
   <span class="key">"description"</span>:<span class="str">"Engineering team chat"</span>,
   <span class="key">"type"</span>:       <span class="num">1</span>,
-  <span class="key">"memberIds"</span>:  [<span class="str">"user_001"</span>, <span class="str">"user_002"</span>]
+  <span class="key">"memberIds"</span>:  [<span class="str">"550e8400-..."</span>, <span class="str">"6ba7b810-..."</span>]
 }
     </div>
 
     <h2 id="rooms-members">POST /api/rooms/{id}/members</h2>
-    <p>Add a user to an existing room. <span class="badge badge-blue">requires auth</span></p>
-    <div class="code-block">{ <span class="key">"userId"</span>: <span class="str">"user_003"</span> }</div>
+    <p>Add a user to an existing room. <span class="badge badge-orange">requires auth</span></p>
+    <div class="code-block">{ <span class="key">"userId"</span>: <span class="str">"550e8400-..."</span> }</div>
 
     <h2 id="rooms-remove">DELETE /api/rooms/{id}/members/{userId}</h2>
-    <p>Remove a specific user from a room. <span class="badge badge-blue">requires auth</span></p>
+    <p>Remove a specific user from a room. <span class="badge badge-orange">requires auth</span></p>
 
     <!-- ═══ MESSAGES ═══ -->
     <h2 id="msg-history">GET /api/messages/room/{roomId}</h2>
-    <p>Returns paginated message history, ordered oldest → newest. <span class="badge badge-blue">requires auth</span></p>
+    <p>Returns paginated message history, ordered oldest → newest. Soft-deleted messages show content as <code>[Message deleted]</code>. <span class="badge badge-orange">requires auth</span></p>
     <div class="param-table-wrap">
       <table class="param-table">
         <thead><tr><th>Query Param</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
@@ -336,33 +368,33 @@
     </div>
 
     <h2 id="msg-send">POST /api/messages</h2>
-    <p>Send a message. Automatically broadcasts <code>ReceiveMessage</code> to all room WebSocket subscribers. <span class="badge badge-blue">requires auth</span></p>
+    <p>Send a message. Automatically broadcasts <code>ReceiveMessage</code> to all room WebSocket subscribers. <span class="badge badge-orange">requires auth</span></p>
     <div class="code-block" style="position:relative;"><button class="copy-btn">Copy</button>
 {
-  <span class="key">"roomId"</span>:   <span class="str">"room_001"</span>,
-  <span class="key">"senderId"</span>: <span class="str">"user_001"</span>,
+  <span class="key">"roomId"</span>:   <span class="str">"550e8400-..."</span>,
+  <span class="key">"senderId"</span>: <span class="str">"6ba7b810-..."</span>,
   <span class="key">"content"</span>:  <span class="str">"Hello world!"</span>,
   <span class="key">"type"</span>:     <span class="num">0</span>   <span class="comment">// 0=Text, 1=Image, 2=File, 3=System</span>
 }
     </div>
 
     <h2 id="msg-edit">PATCH /api/messages/{id}</h2>
-    <p>Edit message content. Emits <code>MessageEdited</code> to room subscribers. Only the original sender can edit. <span class="badge badge-blue">requires auth</span></p>
+    <p>Edit message content. Emits <code>MessageEdited</code> to room subscribers. Only the original sender can edit. <span class="badge badge-orange">requires auth</span></p>
     <div class="code-block">{ <span class="key">"content"</span>: <span class="str">"Updated message text"</span> }</div>
 
     <h2 id="msg-delete">DELETE /api/messages/{id}</h2>
-    <p>Soft-deletes a message (content replaced with <code>[Message deleted]</code>). Emits <code>MessageDeleted</code>. <span class="badge badge-blue">requires auth</span></p>
+    <p>Soft-deletes a message. <code>IsDeleted = true</code>, content replaced with <code>[Message deleted]</code>. Emits <code>MessageDeleted</code>. <span class="badge badge-orange">requires auth</span></p>
 
     <h2 id="msg-read">POST /api/messages/{id}/read</h2>
-    <p>Mark a message as read by a specific user. <span class="badge badge-blue">requires auth</span></p>
-    <div class="code-block">{ <span class="key">"userId"</span>: <span class="str">"user_001"</span> }</div>
+    <p>Mark a message as read by a specific user. <span class="badge badge-orange">requires auth</span></p>
+    <div class="code-block">{ <span class="key">"userId"</span>: <span class="str">"550e8400-..."</span> }</div>
 
     <h2 id="msg-unread">GET /api/messages/room/{roomId}/unread?userId={userId}</h2>
-    <p>Returns the count of unread messages in a room for a user (excludes their own messages). <span class="badge badge-blue">requires auth</span></p>
+    <p>Returns the count of unread messages in a room for a user (excludes their own messages). <span class="badge badge-orange">requires auth</span></p>
 
     <!-- ═══ FILES ═══ -->
     <h2 id="files-upload">POST /api/files/upload</h2>
-    <p>Upload a file using <code>multipart/form-data</code>. Max 20 MB. <span class="badge badge-blue">requires auth</span></p>
+    <p>Upload a file using <code>multipart/form-data</code>. Max 20 MB. <span class="badge badge-orange">requires auth</span></p>
     <div class="warn-box">
       <i data-lucide="alert-triangle" class="icon-sm box-icon"></i>
       <div class="box-body">
@@ -375,23 +407,71 @@
         <tbody>
           <tr><td class="param-name">file</td><td class="param-type">file</td><td>The file to upload <span class="param-req">required</span></td></tr>
           <tr><td class="param-name">roomId</td><td class="param-type">string</td><td>If provided, creates a message in this room</td></tr>
-          <tr><td class="param-name">senderId</td><td class="param-type">string</td><td>Sender ID for the auto-created message</td></tr>
+          <tr><td class="param-name">senderId</td><td class="param-type">string</td><td>Sender GUID for the auto-created message</td></tr>
         </tbody>
       </table>
     </div>
 
     <h2 id="files-delete">DELETE /api/files/{fileName}</h2>
-    <p>Delete a previously uploaded file by its stored filename (UUID + extension). <span class="badge badge-blue">requires auth</span></p>
+    <p>Delete a previously uploaded file by its stored filename (UUID + extension). Path-traversal safe. <span class="badge badge-orange">requires auth</span></p>
+
+    <!-- ═══ AUDIT ═══ -->
+    <h2 id="audit-recent">GET /api/audit/recent</h2>
+    <p>Returns the most recent audit events. <span class="badge badge-purple">admin only</span></p>
+    <div class="param-table-wrap">
+      <table class="param-table">
+        <thead><tr><th>Query Param</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td class="param-name">count</td><td class="param-type">int</td><td>50</td><td>Number of events to return</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="response-block">
+      <div class="response-label">Response 200</div>
+      <div class="code-block">
+{ <span class="key">"success"</span>: <span class="num">true</span>, <span class="key">"data"</span>: [ { <span class="key">"action"</span>:<span class="str">"auth.login"</span>, <span class="key">"username"</span>:<span class="str">"alice"</span>, <span class="key">"success"</span>:<span class="num">true</span>, <span class="key">"timestamp"</span>:<span class="str">"2025-01-01T12:00:00Z"</span> } ] }
+      </div>
+    </div>
+
+    <h2 id="audit-search">GET /api/audit/search</h2>
+    <p>Filter audit events by user, action key, and/or date range. <span class="badge badge-purple">admin only</span></p>
+    <div class="param-table-wrap">
+      <table class="param-table">
+        <thead><tr><th>Query Param</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td class="param-name">userId</td><td class="param-type">string?</td><td>Filter by user GUID</td></tr>
+          <tr><td class="param-name">action</td><td class="param-type">string?</td><td>Filter by action key (e.g. <code>auth.login</code>)</td></tr>
+          <tr><td class="param-name">from</td><td class="param-type">DateTime?</td><td>Start of date range (UTC)</td></tr>
+          <tr><td class="param-name">to</td><td class="param-type">DateTime?</td><td>End of date range (UTC)</td></tr>
+          <tr><td class="param-name">limit</td><td class="param-type">int</td><td>Max results (default 100)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="audit-by-user">GET /api/audit/user/{userId}</h2>
+    <p>Returns all audit events for a specific user. <span class="badge badge-purple">admin only</span></p>
+
+    <h2 id="audit-by-action">GET /api/audit/action/{action}</h2>
+    <p>Returns all audit events matching an action key, e.g. <code>auth.login</code>, <code>file.upload</code>, <code>file.delete</code>. <span class="badge badge-purple">admin only</span></p>
+    <div class="info-box">
+      <i data-lucide="info" class="icon-sm box-icon"></i>
+      <div class="box-body">
+        <strong>Audit action keys:</strong><br/>
+        <code>auth.register</code> · <code>auth.login</code> · <code>auth.login.failed</code> · <code>auth.logout</code> ·
+        <code>auth.refresh</code> · <code>auth.password.changed</code> · <code>file.upload</code> ·
+        <code>file.delete</code> · <code>file.delete.rejected</code>
+      </div>
+    </div>
 
     <!-- ═══ WEBSOCKET ═══ -->
     <h2 id="ws-connect">WebSocket — Connect</h2>
-    <p>The WebSocket hub is powered by <strong>ASP.NET Core SignalR</strong>. Connect using the <code>@microsoft/signalr</code> JS client or any compatible client.</p>
+    <p>The WebSocket hub is powered by <strong>ASP.NET Core SignalR</strong>. Connections require a valid JWT — the hub has <code>[Authorize]</code> and reads identity from the token, not from client-supplied parameters.</p>
     <div class="info-box">
       <i data-lucide="info" class="icon-sm box-icon"></i>
       <div class="box-body">
         <strong>Endpoint:</strong> <code>/hubs/chat</code><br/>
         <strong>Auth:</strong> Pass JWT as query string: <code>?access_token=YOUR_JWT</code><br/>
-        <strong>Online presence:</strong> Connection/disconnection automatically broadcasts <code>UserOnline</code> / <code>UserOffline</code>.
+        <strong>Presence:</strong> Connection/disconnection automatically broadcasts <code>UserOnline</code> / <code>UserOffline</code> to all clients. Identity is read from the JWT — no userId argument needed.
       </div>
     </div>
 
@@ -403,8 +483,8 @@
         <tbody>
           <tr><td class="param-name">JoinRoom</td><td><code>roomId</code></td><td>Subscribe to all messages in a room</td></tr>
           <tr><td class="param-name">LeaveRoom</td><td><code>roomId</code></td><td>Unsubscribe from a room</td></tr>
-          <tr><td class="param-name">Typing</td><td><code>roomId, userId, displayName</code></td><td>Broadcast typing indicator</td></tr>
-          <tr><td class="param-name">StopTyping</td><td><code>roomId, userId</code></td><td>Stop typing indicator</td></tr>
+          <tr><td class="param-name">Typing</td><td><code>roomId</code></td><td>Broadcast typing indicator (identity from JWT)</td></tr>
+          <tr><td class="param-name">StopTyping</td><td><code>roomId</code></td><td>Stop typing indicator</td></tr>
           <tr><td class="param-name">Ping</td><td>—</td><td>Test connection; server replies with Pong</td></tr>
         </tbody>
       </table>
@@ -417,7 +497,7 @@
         <tbody>
           <tr><td class="param-name">ReceiveMessage</td><td><code>{ id, roomId, senderId, senderName, content, type, timestamp }</code></td><td>New message in room</td></tr>
           <tr><td class="param-name">MessageEdited</td><td><code>{ id, content }</code></td><td>Message was edited</td></tr>
-          <tr><td class="param-name">MessageDeleted</td><td><code>{ id, roomId }</code></td><td>Message was deleted</td></tr>
+          <tr><td class="param-name">MessageDeleted</td><td><code>{ id, roomId }</code></td><td>Message was soft-deleted</td></tr>
           <tr><td class="param-name">UserTyping</td><td><code>{ roomId, userId, displayName }</code></td><td>User is typing</td></tr>
           <tr><td class="param-name">UserStoppedTyping</td><td><code>{ roomId, userId }</code></td><td>User stopped typing</td></tr>
           <tr><td class="param-name">UserOnline</td><td><code>{ userId, connectedAt }</code></td><td>User connected</td></tr>
@@ -450,8 +530,8 @@ conn.on(<span class="str">"UserTyping"</span>, ({ displayName }) =&gt; {
 });
 
 <span class="key">await</span> conn.start();
-<span class="key">await</span> conn.invoke(<span class="str">"JoinRoom"</span>, <span class="str">"room_001"</span>);
-<span class="key">await</span> conn.invoke(<span class="str">"Typing"</span>, <span class="str">"room_001"</span>, <span class="str">"user_001"</span>, <span class="str">"Alice"</span>);
+<span class="key">await</span> conn.invoke(<span class="str">"JoinRoom"</span>, <span class="str">"room-guid-here"</span>);
+<span class="key">await</span> conn.invoke(<span class="str">"Typing"</span>, <span class="str">"room-guid-here"</span>);  <span class="comment">// identity from JWT</span>
     </div>
   </main>
 </div>
@@ -465,7 +545,6 @@ conn.on(<span class="str">"UserTyping"</span>, ({ displayName }) =&gt; {
   </p>
 </footer>
 
-<!-- Lucide icons (deferred) -->
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
 <script src="/js/main.js" defer></script>
 </body>
