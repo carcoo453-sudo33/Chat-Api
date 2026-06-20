@@ -2,6 +2,7 @@ using System.Security.Claims;
 using apiContact.Hubs;
 using apiContact.Models.Dtos;
 using apiContact.Models.Entities;
+using apiContact.Models.Enums;
 using apiContact.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

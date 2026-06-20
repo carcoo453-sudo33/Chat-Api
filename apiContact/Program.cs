@@ -1,5 +1,7 @@
+using System.Reflection;
 using System.Text;
 using apiContact.Data;
+using apiContact.Data.Repositories;
 using apiContact.Hubs;
 using apiContact.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -11,6 +13,10 @@ var builder = WebApplication.CreateBuilder(args);
 // ── Controllers & API explorer ────────────────────────────────────────────────
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+
+// ── MediatR (CQRS) ────────────────────────────────────────────────────────────
+builder.Services.AddMediatR(cfg =>
+    cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 
 // ── Swagger with JWT Bearer support ──────────────────────────────────────────
 builder.Services.AddSwaggerGen(c =>
@@ -25,7 +31,6 @@ builder.Services.AddSwaggerGen(c =>
 
     c.EnableAnnotations();
 
-    // Bearer token input in Swagger UI
     var scheme = new OpenApiSecurityScheme
     {
         Name         = "Authorization",
@@ -88,6 +93,12 @@ builder.Services.AddAuthorization();
 // ── SignalR ───────────────────────────────────────────────────────────────────
 builder.Services.AddSignalR();
 
+// ── Repository layer (Unit of Work + Repositories) ───────────────────────────
+builder.Services.AddScoped<IUserRepository,    UserRepository>();
+builder.Services.AddScoped<IRoomRepository,    RoomRepository>();
+builder.Services.AddScoped<IMessageRepository, MessageRepository>();
+builder.Services.AddScoped<IUnitOfWork,        UnitOfWork>();
+
 // ── Application services ──────────────────────────────────────────────────────
 builder.Services.AddSingleton<ChatDbContext>();
 builder.Services.AddScoped<IAuthService,    AuthService>();
@@ -97,12 +108,27 @@ builder.Services.AddScoped<IMessageService, MessageService>();
 builder.Services.AddScoped<IFileService,    FileService>();
 
 // ── CORS ──────────────────────────────────────────────────────────────────────
+var isDev = builder.Environment.IsDevelopment();
+
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("ChatPolicy", policy =>
+    // Development — allow any origin (useful for localhost:3000, live-reload, etc.)
+    options.AddPolicy("DevelopmentPolicy", policy =>
         policy.AllowAnyOrigin()
               .AllowAnyHeader()
               .AllowAnyMethod());
+
+    // Production — allow any origin but require credentials headers to be explicit
+    // To restrict, replace AllowAnyOrigin with WithOrigins("https://your-app.replit.app")
+    options.AddPolicy("ProductionPolicy", policy =>
+        policy.SetIsOriginAllowedToAllowWildcardSubdomains()
+              .WithOrigins(
+                  "https://*.replit.app",
+                  "https://*.replit.dev",
+                  "https://*.repl.co")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials());
 });
 
 builder.WebHost.UseUrls("http://0.0.0.0:5000");
@@ -121,11 +147,11 @@ app.UseSwaggerUI(c =>
     c.InjectJavascript("/js/swagger-nav.js");
 });
 
-app.UseCors("ChatPolicy");
+app.UseCors(isDev ? "DevelopmentPolicy" : "ProductionPolicy");
 app.UseDefaultFiles();
 app.UseStaticFiles();
 
-app.UseAuthentication();   // must come before UseAuthorization
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
@@ -138,11 +164,12 @@ app.MapGet("/health", () => new
     version   = "1.0.0",
     services  = new
     {
-        auth      = "JWT Bearer",
-        websocket = "SignalR",
-        database  = "MongoDB (in-memory fallback)",
-        cache     = "Redis (optional)",
-        storage   = "Blob (local)"
+        auth       = "JWT Bearer",
+        websocket  = "SignalR",
+        database   = "MongoDB (in-memory fallback)",
+        cache      = "Redis (optional)",
+        storage    = "Blob (local)",
+        pattern    = "Repository + Unit of Work + MediatR CQRS"
     }
 });
 

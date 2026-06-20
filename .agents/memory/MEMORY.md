@@ -1,0 +1,1 @@
+- [Chat API architecture](chat-api-arch.md) — Repository+UoW+MediatR CQRS stack; enums in Models/Enums; Controllers → IMediator → Handlers → IUnitOfWork → Repositories → ChatDbContext
