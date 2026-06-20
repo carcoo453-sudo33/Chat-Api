@@ -62,7 +62,7 @@ namespace apiContact.Data.Repositories
             await _col!.UpdateOneAsync(m => m.Id == id,
                 Builders<Message>.Update
                     .Set(m => m.IsDeleted, true)
-                    .Set(m => m.Content, "[Message deleted]"));
+                    .Set(m => m.Content,   "[Message deleted]"));
             return true;
         }
 
@@ -130,7 +130,7 @@ namespace apiContact.Data.Repositories
             if (_db.IsInMemory) { _db.Messages[id] = msg; return msg; }
             await _col!.UpdateOneAsync(m => m.Id == id,
                 Builders<Message>.Update
-                    .Set(m => m.Content, content)
+                    .Set(m => m.Content,  content)
                     .Set(m => m.IsEdited, true));
             return msg;
         }
@@ -189,8 +189,8 @@ namespace apiContact.Data.Repositories
                 src = src.Where(m => m.SenderId == q.SenderId);
             if (!string.IsNullOrWhiteSpace(q.Tag))
                 src = src.Where(m => m.Tags.Any(t => t.Equals(q.Tag, StringComparison.OrdinalIgnoreCase)));
-            if (!string.IsNullOrWhiteSpace(q.Type) && Enum.TryParse<MessageType>(q.Type, true, out var mt))
-                src = src.Where(m => m.Type == mt);
+            if (q.Type.HasValue)
+                src = src.Where(m => m.Type == q.Type.Value);
             if (q.From.HasValue) src = src.Where(m => m.Timestamp >= q.From.Value);
             if (q.To.HasValue)   src = src.Where(m => m.Timestamp <= q.To.Value);
             return src.OrderByDescending(m => m.Timestamp);
@@ -201,7 +201,7 @@ namespace apiContact.Data.Repositories
             var b = Builders<Message>.Filter;
             var filters = new List<FilterDefinition<Message>>
             {
-                b.Eq(m => m.RoomId, roomId),
+                b.Eq(m => m.RoomId,    roomId),
                 b.Eq(m => m.IsDeleted, false)
             };
             if (!string.IsNullOrWhiteSpace(q.Q))
@@ -210,8 +210,8 @@ namespace apiContact.Data.Repositories
                 filters.Add(b.Eq(m => m.SenderId, q.SenderId));
             if (!string.IsNullOrWhiteSpace(q.Tag))
                 filters.Add(b.AnyEq(m => m.Tags, q.Tag));
-            if (!string.IsNullOrWhiteSpace(q.Type) && Enum.TryParse<MessageType>(q.Type, true, out var mt))
-                filters.Add(b.Eq(m => m.Type, mt));
+            if (q.Type.HasValue)
+                filters.Add(b.Eq(m => m.Type, q.Type.Value));
             if (q.From.HasValue) filters.Add(b.Gte(m => m.Timestamp, q.From.Value));
             if (q.To.HasValue)   filters.Add(b.Lte(m => m.Timestamp, q.To.Value));
             return b.And(filters);

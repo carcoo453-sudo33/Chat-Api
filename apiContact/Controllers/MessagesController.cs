@@ -23,7 +23,9 @@ namespace apiContact.Controllers
         private string CallerRole =>
             User.FindFirstValue(ClaimTypes.Role) ?? "user";
 
-        /// <summary>Get paginated message history for a room</summary>
+        // ── History ───────────────────────────────────────────────
+
+        /// <summary>Get paginated message history for a room (newest-first window, re-ordered asc)</summary>
         [HttpGet("room/{roomId}")]
         public async Task<IActionResult> GetByRoom(
             string roomId,
@@ -34,23 +36,20 @@ namespace apiContact.Controllers
             return Ok(ApiResponse<object>.Ok(list, total: list.Count));
         }
 
-        /// <summary>Search messages in a room</summary>
+        /// <summary>Search messages in a room — supports q, tag, senderId, type, from, to with pagination</summary>
         [HttpGet("room/{roomId}/search")]
         public async Task<IActionResult> Search(string roomId, [FromQuery] MessageSearchQuery q)
         {
             var result = await _mediator.Send(new SearchMessagesQuery(roomId, q));
-            return Ok(new
-            {
-                success     = true,
-                message     = "Success",
-                data        = result.Items,
-                total       = result.Total,
-                page        = result.Page,
-                pageSize    = result.PageSize,
-                totalPages  = result.TotalPages,
-                hasNext     = result.HasNext,
-                hasPrevious = result.HasPrevious
-            });
+            return Ok(PagedApiResponse.From(result));
+        }
+
+        /// <summary>Get unread message count in a room for the current user</summary>
+        [HttpGet("room/{roomId}/unread")]
+        public async Task<IActionResult> UnreadCount(string roomId)
+        {
+            var count = await _mediator.Send(new GetUnreadCountQuery(roomId, CallerId));
+            return Ok(ApiResponse<object>.Ok(new { roomId, userId = CallerId, unreadCount = count }));
         }
 
         /// <summary>Get a single message by ID</summary>
@@ -62,7 +61,9 @@ namespace apiContact.Controllers
             return Ok(ApiResponse<object>.Ok(msg));
         }
 
-        /// <summary>Send a message — broadcasts via WebSocket to all room subscribers</summary>
+        // ── Mutations ─────────────────────────────────────────────
+
+        /// <summary>Send a message — persists and broadcasts via WebSocket to all room subscribers</summary>
         [HttpPost]
         public async Task<IActionResult> Send([FromBody] SendMessageDto dto)
         {
@@ -87,14 +88,16 @@ namespace apiContact.Controllers
             return Ok(ApiResponse<object>.Ok(updated, "Message edited"));
         }
 
-        /// <summary>Delete a message (sender or admin)</summary>
+        /// <summary>Soft-delete a message (sender or admin)</summary>
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(string id)
         {
             var existing = await _mediator.Send(new GetMessageByIdQuery(id));
             if (existing is null) return NotFound(ApiResponse<object>.Fail("Message not found"));
 
-            if (existing.SenderId != CallerId && !CallerRole.Equals("admin", StringComparison.OrdinalIgnoreCase))
+            if (existing.SenderId != CallerId &&
+                !CallerRole.Equals("admin", StringComparison.OrdinalIgnoreCase) &&
+                !CallerRole.Equals("Admin", StringComparison.OrdinalIgnoreCase))
                 return Forbid();
 
             await _mediator.Send(new DeleteMessageCommand(id, existing.RoomId));
@@ -109,13 +112,7 @@ namespace apiContact.Controllers
             return Ok(ApiResponse<object>.Ok(new { id, userId = CallerId }, "Marked as read"));
         }
 
-        /// <summary>Get unread message count in a room for the current user</summary>
-        [HttpGet("room/{roomId}/unread")]
-        public async Task<IActionResult> UnreadCount(string roomId)
-        {
-            var count = await _mediator.Send(new GetUnreadCountQuery(roomId, CallerId));
-            return Ok(ApiResponse<object>.Ok(new { roomId, userId = CallerId, unreadCount = count }));
-        }
+        // ── Reactions ─────────────────────────────────────────────
 
         /// <summary>Add an emoji reaction to a message</summary>
         [HttpPost("{id}/reactions")]

@@ -13,5 +13,8 @@ namespace apiContact.Data.Repositories
         Task<bool>           RemoveMemberAsync(string roomId, string userId);
         Task                 UpdateLastMessageAsync(string roomId, string preview);
         Task<bool>           SlugExistsAsync(string slug);
+        Task<List<string>>   GetAllCategoriesAsync();
+        Task<List<string>>   GetAllTagsAsync();
+        Task<List<string>>   GetMemberIdsAsync(string roomId);
     }
 }

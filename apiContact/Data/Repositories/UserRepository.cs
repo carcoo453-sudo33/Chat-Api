@@ -1,6 +1,7 @@
 using System.Linq.Expressions;
 using apiContact.Models.Dtos;
 using apiContact.Models.Entities;
+using apiContact.Models.Enums;
 using MongoDB.Driver;
 
 namespace apiContact.Data.Repositories
@@ -93,17 +94,21 @@ namespace apiContact.Data.Repositories
         public async Task<List<ChatUser>> GetOnlineUsersAsync()
         {
             if (_db.IsInMemory)
-                return _db.Users.Values.Where(u => u.IsOnline).ToList();
-            return await _col!.Find(u => u.IsOnline).ToListAsync();
+                return _db.Users.Values.Where(u => u.Status == UserStatus.Online).ToList();
+            return await _col!.Find(u => u.Status == UserStatus.Online).ToListAsync();
         }
 
-        public async Task SetStatusAsync(string id, bool isOnline)
+        public async Task SetStatusAsync(string id, UserStatus status)
         {
             var u = await GetByIdAsync(id);
             if (u is null) return;
-            u.IsOnline = isOnline;
+            u.Status  = status;
             u.LastSeen = DateTime.UtcNow;
-            await UpdateAsync(u);
+            if (_db.IsInMemory) { _db.Users[id] = u; return; }
+            await _col!.UpdateOneAsync(x => x.Id == id,
+                Builders<ChatUser>.Update
+                    .Set(x => x.Status,   status)
+                    .Set(x => x.LastSeen, DateTime.UtcNow));
         }
 
         public async Task SaveRefreshTokenAsync(string id, string? token, DateTime? expiry)
@@ -130,21 +135,56 @@ namespace apiContact.Data.Repositories
             return true;
         }
 
-        public async Task<List<ChatUser>> SearchAsync(string query, int skip, int take)
+        public async Task<List<ChatUser>> SearchAsync(UserSearchQuery q)
         {
-            query = query.ToLower();
+            q.Clamp();
             if (_db.IsInMemory)
-                return _db.Users.Values
-                    .Where(u => u.Username.Contains(query, StringComparison.OrdinalIgnoreCase)
-                             || u.DisplayName.Contains(query, StringComparison.OrdinalIgnoreCase)
-                             || u.Email.Contains(query, StringComparison.OrdinalIgnoreCase))
-                    .Skip(skip).Take(take).ToList();
+                return ApplyFilter(_db.Users.Values, q).Skip(q.Skip).Take(q.PageSize).ToList();
 
-            var filter = Builders<ChatUser>.Filter.Or(
-                Builders<ChatUser>.Filter.Regex(u => u.Username,    new MongoDB.Bson.BsonRegularExpression(query, "i")),
-                Builders<ChatUser>.Filter.Regex(u => u.DisplayName, new MongoDB.Bson.BsonRegularExpression(query, "i"))
-            );
-            return await _col!.Find(filter).Skip(skip).Limit(take).ToListAsync();
+            var filter = BuildMongoFilter(q);
+            return await _col!.Find(filter).Skip(q.Skip).Limit(q.PageSize).ToListAsync();
+        }
+
+        public async Task<int> CountSearchAsync(UserSearchQuery q)
+        {
+            if (_db.IsInMemory)
+                return ApplyFilter(_db.Users.Values, q).Count();
+            return (int)await _col!.CountDocumentsAsync(BuildMongoFilter(q));
+        }
+
+        // ── Helpers ──────────────────────────────────────────────
+        private static IEnumerable<ChatUser> ApplyFilter(
+            IEnumerable<ChatUser> src, UserSearchQuery q)
+        {
+            if (!string.IsNullOrWhiteSpace(q.Q))
+                src = src.Where(u =>
+                    u.Username.Contains(q.Q,    StringComparison.OrdinalIgnoreCase) ||
+                    u.DisplayName.Contains(q.Q, StringComparison.OrdinalIgnoreCase) ||
+                    u.Email.Contains(q.Q,       StringComparison.OrdinalIgnoreCase));
+            if (q.Role.HasValue)
+                src = src.Where(u => u.RoleEnum == q.Role.Value);
+            if (q.OnlineOnly == true)
+                src = src.Where(u => u.Status == UserStatus.Online);
+            return src.OrderBy(u => u.DisplayName);
+        }
+
+        private static FilterDefinition<ChatUser> BuildMongoFilter(UserSearchQuery q)
+        {
+            var b       = Builders<ChatUser>.Filter;
+            var filters = new List<FilterDefinition<ChatUser>>();
+
+            if (!string.IsNullOrWhiteSpace(q.Q))
+                filters.Add(b.Or(
+                    b.Regex(u => u.Username,    new MongoDB.Bson.BsonRegularExpression(q.Q, "i")),
+                    b.Regex(u => u.DisplayName, new MongoDB.Bson.BsonRegularExpression(q.Q, "i"))));
+
+            if (q.Role.HasValue)
+                filters.Add(b.Eq(u => u.Role, q.Role.Value.ToString()));
+
+            if (q.OnlineOnly == true)
+                filters.Add(b.Eq(u => u.Status, UserStatus.Online));
+
+            return filters.Count > 0 ? b.And(filters) : b.Empty;
         }
     }
 }

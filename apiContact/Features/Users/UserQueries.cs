@@ -27,22 +27,52 @@ namespace apiContact.Features.Users
             => _uow.Users.GetByIdAsync(q.Id);
     }
 
+    // ── GetOnlineUsers ────────────────────────────────────────
+    public record GetOnlineUsersQuery : IRequest<List<ChatUser>>;
+
+    public class GetOnlineUsersHandler : IRequestHandler<GetOnlineUsersQuery, List<ChatUser>>
+    {
+        private readonly IUnitOfWork _uow;
+        public GetOnlineUsersHandler(IUnitOfWork uow) => _uow = uow;
+        public Task<List<ChatUser>> Handle(GetOnlineUsersQuery _, CancellationToken ct)
+            => _uow.Users.GetOnlineUsersAsync();
+    }
+
+    // ── GetUsersByRoom ────────────────────────────────────────
+    public record GetUsersByRoomQuery(string RoomId) : IRequest<List<ChatUser>>;
+
+    public class GetUsersByRoomHandler : IRequestHandler<GetUsersByRoomQuery, List<ChatUser>>
+    {
+        private readonly IUnitOfWork _uow;
+        public GetUsersByRoomHandler(IUnitOfWork uow) => _uow = uow;
+
+        public async Task<List<ChatUser>> Handle(GetUsersByRoomQuery q, CancellationToken ct)
+        {
+            var memberIds = await _uow.Rooms.GetMemberIdsAsync(q.RoomId);
+            var users     = new List<ChatUser>(memberIds.Count);
+            foreach (var id in memberIds)
+            {
+                var user = await _uow.Users.GetByIdAsync(id);
+                if (user is not null) users.Add(user);
+            }
+            return users;
+        }
+    }
+
     // ── SearchUsers ───────────────────────────────────────────
-    public record SearchUsersQuery(string Q, int Page = 1, int PageSize = 20)
-        : IRequest<PagedResult<ChatUser>>;
+    public record SearchUsersQuery(UserSearchQuery Params) : IRequest<PagedResult<ChatUser>>;
 
     public class SearchUsersHandler : IRequestHandler<SearchUsersQuery, PagedResult<ChatUser>>
     {
         private readonly IUnitOfWork _uow;
         public SearchUsersHandler(IUnitOfWork uow) => _uow = uow;
+
         public async Task<PagedResult<ChatUser>> Handle(SearchUsersQuery q, CancellationToken ct)
         {
-            var pq = new PagedQuery { Page = q.Page, PageSize = q.PageSize };
-            pq.Clamp();
-            var items = await _uow.Users.SearchAsync(q.Q, pq.Skip, pq.PageSize);
-            // total count for pagination
-            var total = (await _uow.Users.SearchAsync(q.Q, 0, int.MaxValue)).Count;
-            return PagedResult<ChatUser>.From(items, total, pq.Page, pq.PageSize);
+            q.Params.Clamp();
+            var items = await _uow.Users.SearchAsync(q.Params);
+            var total = await _uow.Users.CountSearchAsync(q.Params);
+            return PagedResult<ChatUser>.From(items, total, q.Params.Page, q.Params.PageSize);
         }
     }
 }

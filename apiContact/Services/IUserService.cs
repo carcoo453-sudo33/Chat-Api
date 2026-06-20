@@ -1,5 +1,6 @@
 using apiContact.Models.Dtos;
 using apiContact.Models.Entities;
+using apiContact.Models.Enums;
 
 namespace apiContact.Services
 {
@@ -14,6 +15,11 @@ namespace apiContact.Services
         Task<bool> ChangePasswordAsync(string id, string newPasswordHash);
         Task SaveRefreshTokenAsync(string id, string? token, DateTime? expiry);
         Task<bool> DeleteAsync(string id);
+
+        /// <summary>Set simple online/offline presence (used by SignalR hub)</summary>
         Task SetOnlineAsync(string id, bool isOnline);
+
+        /// <summary>Set full presence status</summary>
+        Task SetStatusAsync(string id, UserStatus status);
     }
 }

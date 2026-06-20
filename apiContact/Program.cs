@@ -58,7 +58,13 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 // ── JWT Authentication ────────────────────────────────────────────────────────
-var jwtKey = builder.Configuration["Jwt:Key"]!;
+// Key is read from the JWT_KEY environment variable (Replit secret).
+// Falls back to the appsettings.json value for local dev only.
+var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY")
+          ?? builder.Configuration["Jwt:Key"]
+          ?? throw new InvalidOperationException(
+                 "JWT key is not configured. Set the JWT_KEY environment variable.");
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -110,6 +116,10 @@ builder.Services.AddScoped<IFileService,    FileService>();
 // ── CORS ──────────────────────────────────────────────────────────────────────
 var isDev = builder.Environment.IsDevelopment();
 
+// Collect runtime Replit domains for the production policy
+var replitDev    = Environment.GetEnvironmentVariable("REPLIT_DEV_DOMAIN") ?? "";
+var replitDomain = Environment.GetEnvironmentVariable("REPLIT_DOMAINS")    ?? "";
+
 builder.Services.AddCors(options =>
 {
     // Development — allow any origin (useful for localhost:3000, live-reload, etc.)
@@ -118,14 +128,19 @@ builder.Services.AddCors(options =>
               .AllowAnyHeader()
               .AllowAnyMethod());
 
-    // Production — allow any origin but require credentials headers to be explicit
-    // To restrict, replace AllowAnyOrigin with WithOrigins("https://your-app.replit.app")
+    // Production — restrict to known Replit origins + explicit allowed credentials
+    var allowedOrigins = new List<string>
+    {
+        "https://*.replit.app",
+        "https://*.replit.dev",
+        "https://*.repl.co"
+    };
+    if (!string.IsNullOrWhiteSpace(replitDev))    allowedOrigins.Add($"https://{replitDev}");
+    if (!string.IsNullOrWhiteSpace(replitDomain)) allowedOrigins.Add($"https://{replitDomain}");
+
     options.AddPolicy("ProductionPolicy", policy =>
         policy.SetIsOriginAllowedToAllowWildcardSubdomains()
-              .WithOrigins(
-                  "https://*.replit.app",
-                  "https://*.replit.dev",
-                  "https://*.repl.co")
+              .WithOrigins(allowedOrigins.ToArray())
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials());
@@ -164,12 +179,12 @@ app.MapGet("/health", () => new
     version   = "1.0.0",
     services  = new
     {
-        auth       = "JWT Bearer",
-        websocket  = "SignalR",
-        database   = "MongoDB (in-memory fallback)",
-        cache      = "Redis (optional)",
-        storage    = "Blob (local)",
-        pattern    = "Repository + Unit of Work + MediatR CQRS"
+        auth      = "JWT Bearer (key from JWT_KEY env var)",
+        websocket = "SignalR",
+        database  = "MongoDB (in-memory fallback)",
+        cache     = "Redis (optional)",
+        storage   = "Blob (local)",
+        pattern   = "Repository + Unit of Work + MediatR CQRS"
     }
 });
 

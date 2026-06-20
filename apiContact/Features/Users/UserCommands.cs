@@ -1,6 +1,7 @@
 using apiContact.Data.Repositories;
 using apiContact.Models.Dtos;
 using apiContact.Models.Entities;
+using apiContact.Models.Enums;
 using MediatR;
 using MongoDB.Bson;
 
@@ -25,7 +26,7 @@ namespace apiContact.Features.Users
                 Email        = cmd.Dto.Email.Trim().ToLower(),
                 AvatarUrl    = cmd.Dto.AvatarUrl,
                 Role         = cmd.Dto.Role,
-                PasswordHash = cmd.Dto.Password,  // caller passes pre-hashed value
+                PasswordHash = cmd.Dto.Password,
                 CreatedAt    = DateTime.UtcNow
             };
             return await _uow.Users.AddAsync(user);
@@ -48,7 +49,7 @@ namespace apiContact.Features.Users
             if (cmd.Dto.AvatarUrl   is not null) user.AvatarUrl   = cmd.Dto.AvatarUrl;
             if (cmd.Dto.IsOnline.HasValue)
             {
-                user.IsOnline = cmd.Dto.IsOnline.Value;
+                user.Status   = cmd.Dto.IsOnline.Value ? UserStatus.Online : UserStatus.Offline;
                 user.LastSeen = DateTime.UtcNow;
             }
             return await _uow.Users.UpdateAsync(user);
@@ -56,7 +57,8 @@ namespace apiContact.Features.Users
     }
 
     // ── SetUserStatus ─────────────────────────────────────────
-    public record SetUserStatusCommand(string Id, bool IsOnline) : IRequest<bool>;
+    /// <summary>Set full presence status (Online, Away, Busy, Offline)</summary>
+    public record SetUserStatusCommand(string Id, UserStatus Status) : IRequest<bool>;
 
     public class SetUserStatusHandler : IRequestHandler<SetUserStatusCommand, bool>
     {
@@ -67,7 +69,7 @@ namespace apiContact.Features.Users
         {
             var user = await _uow.Users.GetByIdAsync(cmd.Id);
             if (user is null) return false;
-            await _uow.Users.SetStatusAsync(cmd.Id, cmd.IsOnline);
+            await _uow.Users.SetStatusAsync(cmd.Id, cmd.Status);
             return true;
         }
     }

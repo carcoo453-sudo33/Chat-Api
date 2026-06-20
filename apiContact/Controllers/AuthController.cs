@@ -2,8 +2,8 @@ using System.Security.Claims;
 using apiContact.Data.Repositories;
 using apiContact.Models.Dtos;
 using apiContact.Models.Entities;
+using apiContact.Models.Enums;
 using apiContact.Services;
-using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
@@ -15,8 +15,8 @@ namespace apiContact.Controllers
     [Produces("application/json")]
     public class AuthController : ControllerBase
     {
-        private readonly IUnitOfWork   _uow;
-        private readonly IAuthService  _auth;
+        private readonly IUnitOfWork  _uow;
+        private readonly IAuthService _auth;
         private readonly IConfiguration _config;
 
         public AuthController(IUnitOfWork uow, IAuthService auth, IConfiguration config)
@@ -25,6 +25,12 @@ namespace apiContact.Controllers
             _auth   = auth;
             _config = config;
         }
+
+        private int AccessExpiryMinutes =>
+            int.TryParse(_config["Jwt:AccessTokenExpiryMinutes"], out var m) ? m : 60;
+
+        private int RefreshExpiryDays =>
+            int.TryParse(_config["Jwt:RefreshTokenExpiryDays"], out var d) ? d : 7;
 
         /// <summary>Register a new account</summary>
         [HttpPost("register")]
@@ -51,20 +57,17 @@ namespace apiContact.Controllers
                 DisplayName  = string.IsNullOrWhiteSpace(dto.DisplayName) ? dto.Username : dto.DisplayName,
                 Email        = dto.Email.Trim().ToLower(),
                 AvatarUrl    = dto.AvatarUrl,
-                Role         = "User",
+                Role         = nameof(UserRole.User),
                 PasswordHash = _auth.HashPassword(dto.Password),
                 CreatedAt    = DateTime.UtcNow
             };
             await _uow.Users.AddAsync(user);
 
             var refreshToken  = _auth.GenerateRefreshToken();
-            var refreshExpiry = DateTime.UtcNow.AddDays(
-                int.Parse(_config["Jwt:RefreshTokenExpiryDays"] ?? "7"));
-
+            var refreshExpiry = DateTime.UtcNow.AddDays(RefreshExpiryDays);
             await _uow.Users.SaveRefreshTokenAsync(user.Id, refreshToken, refreshExpiry);
 
-            var accessToken   = _auth.GenerateAccessToken(user);
-            var expiryMinutes = int.Parse(_config["Jwt:AccessTokenExpiryMinutes"] ?? "60");
+            var accessToken = _auth.GenerateAccessToken(user);
 
             return CreatedAtAction(nameof(Me), null, ApiResponse<object>.Ok(new AuthResponseDto
             {
@@ -74,7 +77,7 @@ namespace apiContact.Controllers
                 Username     = user.Username,
                 DisplayName  = user.DisplayName,
                 Role         = user.Role,
-                ExpiresAt    = DateTime.UtcNow.AddMinutes(expiryMinutes)
+                ExpiresAt    = DateTime.UtcNow.AddMinutes(AccessExpiryMinutes)
             }, "Account created"));
         }
 
@@ -93,14 +96,11 @@ namespace apiContact.Controllers
                 return Unauthorized(ApiResponse<object>.Fail("Invalid credentials"));
 
             var refreshToken  = _auth.GenerateRefreshToken();
-            var refreshExpiry = DateTime.UtcNow.AddDays(
-                int.Parse(_config["Jwt:RefreshTokenExpiryDays"] ?? "7"));
-
+            var refreshExpiry = DateTime.UtcNow.AddDays(RefreshExpiryDays);
             await _uow.Users.SaveRefreshTokenAsync(user.Id, refreshToken, refreshExpiry);
-            await _uow.Users.SetStatusAsync(user.Id, true);
+            await _uow.Users.SetStatusAsync(user.Id, UserStatus.Online);
 
-            var accessToken   = _auth.GenerateAccessToken(user);
-            var expiryMinutes = int.Parse(_config["Jwt:AccessTokenExpiryMinutes"] ?? "60");
+            var accessToken = _auth.GenerateAccessToken(user);
 
             return Ok(ApiResponse<object>.Ok(new AuthResponseDto
             {
@@ -110,7 +110,7 @@ namespace apiContact.Controllers
                 Username     = user.Username,
                 DisplayName  = user.DisplayName,
                 Role         = user.Role,
-                ExpiresAt    = DateTime.UtcNow.AddMinutes(expiryMinutes)
+                ExpiresAt    = DateTime.UtcNow.AddMinutes(AccessExpiryMinutes)
             }, "Login successful"));
         }
 
@@ -131,13 +131,10 @@ namespace apiContact.Controllers
                 return Unauthorized(ApiResponse<object>.Fail("Invalid or expired refresh token"));
 
             var newRefreshToken = _auth.GenerateRefreshToken();
-            var refreshExpiry   = DateTime.UtcNow.AddDays(
-                int.Parse(_config["Jwt:RefreshTokenExpiryDays"] ?? "7"));
-
+            var refreshExpiry   = DateTime.UtcNow.AddDays(RefreshExpiryDays);
             await _uow.Users.SaveRefreshTokenAsync(user.Id, newRefreshToken, refreshExpiry);
 
-            var accessToken   = _auth.GenerateAccessToken(user);
-            var expiryMinutes = int.Parse(_config["Jwt:AccessTokenExpiryMinutes"] ?? "60");
+            var accessToken = _auth.GenerateAccessToken(user);
 
             return Ok(ApiResponse<object>.Ok(new AuthResponseDto
             {
@@ -147,11 +144,11 @@ namespace apiContact.Controllers
                 Username     = user.Username,
                 DisplayName  = user.DisplayName,
                 Role         = user.Role,
-                ExpiresAt    = DateTime.UtcNow.AddMinutes(expiryMinutes)
+                ExpiresAt    = DateTime.UtcNow.AddMinutes(AccessExpiryMinutes)
             }, "Token refreshed"));
         }
 
-        /// <summary>Logout — revokes the refresh token</summary>
+        /// <summary>Logout — revokes refresh token and sets user offline</summary>
         [HttpPost("logout")]
         [Authorize]
         public async Task<IActionResult> Logout()
@@ -162,7 +159,7 @@ namespace apiContact.Controllers
             if (!string.IsNullOrWhiteSpace(userId))
             {
                 await _uow.Users.SaveRefreshTokenAsync(userId, null, null);
-                await _uow.Users.SetStatusAsync(userId, false);
+                await _uow.Users.SetStatusAsync(userId, UserStatus.Offline);
             }
 
             return Ok(ApiResponse<object>.Ok(new { }, "Logged out"));
@@ -191,7 +188,7 @@ namespace apiContact.Controllers
             }));
         }
 
-        /// <summary>Change password for the authenticated user</summary>
+        /// <summary>Change password — revokes all existing sessions</summary>
         [HttpPost("change-password")]
         [Authorize]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto dto)
@@ -212,7 +209,7 @@ namespace apiContact.Controllers
                 return Unauthorized(ApiResponse<object>.Fail("Current password is incorrect"));
 
             await _uow.Users.ChangePasswordAsync(user.Id, _auth.HashPassword(dto.NewPassword));
-            await _uow.Users.SaveRefreshTokenAsync(user.Id, null, null);  // revoke all sessions
+            await _uow.Users.SaveRefreshTokenAsync(user.Id, null, null);
 
             return Ok(ApiResponse<object>.Ok(new { }, "Password changed. Please log in again."));
         }

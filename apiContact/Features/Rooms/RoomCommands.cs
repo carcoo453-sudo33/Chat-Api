@@ -17,16 +17,20 @@ namespace apiContact.Features.Rooms
 
         public async Task<ChatRoom> Handle(CreateRoomCommand cmd, CancellationToken ct)
         {
-            // Auto-include caller
             var dto = cmd.Dto;
             dto.CreatedBy = cmd.CallerId;
             if (!dto.MemberIds.Contains(cmd.CallerId))
                 dto.MemberIds.Add(cmd.CallerId);
 
-            // Generate unique slug
+            // Efficient slug uniquification — uses SlugExistsAsync (single DB call per attempt)
             var baseSlug = SlugHelper.Generate(dto.Name);
-            var allSlugs = (await _uow.Rooms.GetAllAsync()).Select(r => r.Slug);
-            var slug     = SlugHelper.Uniquify(baseSlug, allSlugs);
+            var slug     = baseSlug;
+            if (await _uow.Rooms.SlugExistsAsync(slug))
+            {
+                int counter = 2;
+                do { slug = $"{baseSlug}-{counter++}"; }
+                while (await _uow.Rooms.SlugExistsAsync(slug));
+            }
 
             var room = new ChatRoom
             {
@@ -59,12 +63,45 @@ namespace apiContact.Features.Rooms
             var room = await _uow.Rooms.GetByIdAsync(cmd.Id);
             if (room is null) return null;
             var dto = cmd.Dto;
-            if (dto.Name        is not null) { room.Name = dto.Name; room.Slug = SlugHelper.Generate(dto.Name); }
+
+            if (dto.Name is not null)
+            {
+                room.Name = dto.Name;
+                // Regenerate slug only when name changes; ensure uniqueness
+                var baseSlug = SlugHelper.Generate(dto.Name);
+                var slug     = baseSlug;
+                if (slug != room.Slug && await _uow.Rooms.SlugExistsAsync(slug))
+                {
+                    int counter = 2;
+                    do { slug = $"{baseSlug}-{counter++}"; }
+                    while (await _uow.Rooms.SlugExistsAsync(slug));
+                }
+                room.Slug = slug;
+            }
+
             if (dto.Description is not null) room.Description = dto.Description;
             if (dto.Category    is not null) room.Category    = dto.Category;
             if (dto.Tags        is not null) room.Tags        = dto.Tags;
             if (dto.IsArchived.HasValue)     room.IsArchived  = dto.IsArchived.Value;
             if (dto.IsPrivate.HasValue)      room.IsPrivate   = dto.IsPrivate.Value;
+
+            return await _uow.Rooms.UpdateAsync(room);
+        }
+    }
+
+    // ── ArchiveRoom ───────────────────────────────────────────
+    public record ArchiveRoomCommand(string Id, bool Archive = true) : IRequest<ChatRoom?>;
+
+    public class ArchiveRoomHandler : IRequestHandler<ArchiveRoomCommand, ChatRoom?>
+    {
+        private readonly IUnitOfWork _uow;
+        public ArchiveRoomHandler(IUnitOfWork uow) => _uow = uow;
+
+        public async Task<ChatRoom?> Handle(ArchiveRoomCommand cmd, CancellationToken ct)
+        {
+            var room = await _uow.Rooms.GetByIdAsync(cmd.Id);
+            if (room is null) return null;
+            room.IsArchived = cmd.Archive;
             return await _uow.Rooms.UpdateAsync(room);
         }
     }

@@ -49,6 +49,39 @@ namespace apiContact.Features.Rooms
             => _uow.Rooms.GetByUserAsync(q.UserId);
     }
 
+    // ── GetRoomMembers ────────────────────────────────────────
+    public record GetRoomMembersQuery(string RoomId) : IRequest<List<string>>;
+
+    public class GetRoomMembersHandler : IRequestHandler<GetRoomMembersQuery, List<string>>
+    {
+        private readonly IUnitOfWork _uow;
+        public GetRoomMembersHandler(IUnitOfWork uow) => _uow = uow;
+        public Task<List<string>> Handle(GetRoomMembersQuery q, CancellationToken ct)
+            => _uow.Rooms.GetMemberIdsAsync(q.RoomId);
+    }
+
+    // ── GetRoomCategories ─────────────────────────────────────
+    public record GetRoomCategoriesQuery : IRequest<List<string>>;
+
+    public class GetRoomCategoriesHandler : IRequestHandler<GetRoomCategoriesQuery, List<string>>
+    {
+        private readonly IUnitOfWork _uow;
+        public GetRoomCategoriesHandler(IUnitOfWork uow) => _uow = uow;
+        public Task<List<string>> Handle(GetRoomCategoriesQuery _, CancellationToken ct)
+            => _uow.Rooms.GetAllCategoriesAsync();
+    }
+
+    // ── GetRoomTags ───────────────────────────────────────────
+    public record GetRoomTagsQuery : IRequest<List<string>>;
+
+    public class GetRoomTagsHandler : IRequestHandler<GetRoomTagsQuery, List<string>>
+    {
+        private readonly IUnitOfWork _uow;
+        public GetRoomTagsHandler(IUnitOfWork uow) => _uow = uow;
+        public Task<List<string>> Handle(GetRoomTagsQuery _, CancellationToken ct)
+            => _uow.Rooms.GetAllTagsAsync();
+    }
+
     // ── SearchRooms ───────────────────────────────────────────
     public record SearchRoomsQuery(RoomSearchQuery Params) : IRequest<PagedResult<ChatRoom>>;
 

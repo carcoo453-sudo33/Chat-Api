@@ -103,7 +103,7 @@ namespace apiContact.Data.Repositories
                     .Skip(q.Skip).Take(q.PageSize).ToList();
 
             var filter = BuildMongoRoomFilter(q);
-            var sort   = BuildMongoRoomSort(q.Sort);
+            var sort   = BuildMongoRoomSort(q);
             return await _col!.Find(filter).Sort(sort).Skip(q.Skip).Limit(q.PageSize).ToListAsync();
         }
 
@@ -146,7 +146,7 @@ namespace apiContact.Data.Repositories
             await _col!.UpdateOneAsync(r => r.Id == roomId,
                 Builders<ChatRoom>.Update
                     .Set(r => r.LastMessagePreview, preview)
-                    .Set(r => r.LastMessageAt, DateTime.UtcNow));
+                    .Set(r => r.LastMessageAt,      DateTime.UtcNow));
         }
 
         public async Task<bool> SlugExistsAsync(string slug)
@@ -156,50 +156,119 @@ namespace apiContact.Data.Repositories
             return await _col!.Find(r => r.Slug == slug).AnyAsync();
         }
 
+        public Task<List<string>> GetAllCategoriesAsync()
+        {
+            if (_db.IsInMemory)
+            {
+                var cats = _db.Rooms.Values
+                    .Where(r => !string.IsNullOrWhiteSpace(r.Category))
+                    .Select(r => r.Category)
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .OrderBy(c => c)
+                    .ToList();
+                return Task.FromResult(cats);
+            }
+            // MongoDB: use distinct
+            return _col!.Distinct<string>("Category",
+                Builders<ChatRoom>.Filter.Ne(r => r.Category, string.Empty))
+                .ToListAsync();
+        }
+
+        public Task<List<string>> GetAllTagsAsync()
+        {
+            if (_db.IsInMemory)
+            {
+                var tags = _db.Rooms.Values
+                    .SelectMany(r => r.Tags)
+                    .Where(t => !string.IsNullOrWhiteSpace(t))
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .OrderBy(t => t)
+                    .ToList();
+                return Task.FromResult(tags);
+            }
+            return _col!.Distinct<string>("Tags",
+                Builders<ChatRoom>.Filter.Empty)
+                .ToListAsync();
+        }
+
+        public async Task<List<string>> GetMemberIdsAsync(string roomId)
+        {
+            var room = await GetByIdAsync(roomId);
+            return room?.MemberIds ?? new List<string>();
+        }
+
         // ── Helpers ──────────────────────────────────────────────
         private static IEnumerable<ChatRoom> ApplyRoomFilter(
             IEnumerable<ChatRoom> src, RoomSearchQuery q)
         {
+            if (!q.IncludeArchived)
+                src = src.Where(r => !r.IsArchived);
+
             if (!string.IsNullOrWhiteSpace(q.Q))
                 src = src.Where(r =>
-                    r.Name.Contains(q.Q, StringComparison.OrdinalIgnoreCase) ||
+                    r.Name.Contains(q.Q,        StringComparison.OrdinalIgnoreCase) ||
                     r.Description.Contains(q.Q, StringComparison.OrdinalIgnoreCase) ||
                     r.Tags.Any(t => t.Contains(q.Q, StringComparison.OrdinalIgnoreCase)));
+
             if (!string.IsNullOrWhiteSpace(q.Category))
                 src = src.Where(r => r.Category.Equals(q.Category, StringComparison.OrdinalIgnoreCase));
+
             if (!string.IsNullOrWhiteSpace(q.Tag))
                 src = src.Where(r => r.Tags.Any(t => t.Equals(q.Tag, StringComparison.OrdinalIgnoreCase)));
-            if (!string.IsNullOrWhiteSpace(q.Type) && Enum.TryParse<RoomType>(q.Type, true, out var rt))
-                src = src.Where(r => r.Type == rt);
-            src = src.Where(r => !r.IsArchived);
-            return q.Sort == "name" ? src.OrderBy(r => r.Name)
-                 : q.Sort == "created" ? src.OrderByDescending(r => r.CreatedAt)
-                 : src.OrderByDescending(r => r.LastMessageAt);
+
+            if (q.Type.HasValue)
+                src = src.Where(r => r.Type == q.Type.Value);
+
+            return (q.SortBy, q.Direction) switch
+            {
+                (RoomSortBy.Name,        SortOrder.Asc)  => src.OrderBy(r => r.Name),
+                (RoomSortBy.Name,        SortOrder.Desc) => src.OrderByDescending(r => r.Name),
+                (RoomSortBy.CreatedAt,   SortOrder.Asc)  => src.OrderBy(r => r.CreatedAt),
+                (RoomSortBy.CreatedAt,   SortOrder.Desc) => src.OrderByDescending(r => r.CreatedAt),
+                (RoomSortBy.MemberCount, SortOrder.Asc)  => src.OrderBy(r => r.MemberIds.Count),
+                (RoomSortBy.MemberCount, SortOrder.Desc) => src.OrderByDescending(r => r.MemberIds.Count),
+                (RoomSortBy.Activity,    SortOrder.Asc)  => src.OrderBy(r => r.LastMessageAt),
+                _                                        => src.OrderByDescending(r => r.LastMessageAt),
+            };
         }
 
         private static FilterDefinition<ChatRoom> BuildMongoRoomFilter(RoomSearchQuery q)
         {
             var builder = Builders<ChatRoom>.Filter;
-            var filters = new List<FilterDefinition<ChatRoom>>
-            {
-                builder.Eq(r => r.IsArchived, false)
-            };
+            var filters = new List<FilterDefinition<ChatRoom>>();
+
+            if (!q.IncludeArchived)
+                filters.Add(builder.Eq(r => r.IsArchived, false));
+
             if (!string.IsNullOrWhiteSpace(q.Q))
                 filters.Add(builder.Or(
                     builder.Regex(r => r.Name,        new MongoDB.Bson.BsonRegularExpression(q.Q, "i")),
-                    builder.Regex(r => r.Description, new MongoDB.Bson.BsonRegularExpression(q.Q, "i"))));
+                    builder.Regex(r => r.Description, new MongoDB.Bson.BsonRegularExpression(q.Q, "i")),
+                    builder.AnyEq(r => r.Tags,        q.Q)));
+
             if (!string.IsNullOrWhiteSpace(q.Category))
-                filters.Add(builder.Regex(r => r.Category, new MongoDB.Bson.BsonRegularExpression($"^{q.Category}$", "i")));
+                filters.Add(builder.Regex(r => r.Category,
+                    new MongoDB.Bson.BsonRegularExpression($"^{q.Category}$", "i")));
+
             if (!string.IsNullOrWhiteSpace(q.Tag))
                 filters.Add(builder.AnyEq(r => r.Tags, q.Tag));
-            if (!string.IsNullOrWhiteSpace(q.Type) && Enum.TryParse<RoomType>(q.Type, true, out var rt))
-                filters.Add(builder.Eq(r => r.Type, rt));
-            return builder.And(filters);
+
+            if (q.Type.HasValue)
+                filters.Add(builder.Eq(r => r.Type, q.Type.Value));
+
+            return filters.Count > 0 ? builder.And(filters) : builder.Empty;
         }
 
-        private static SortDefinition<ChatRoom> BuildMongoRoomSort(string? sort) =>
-            sort == "name"    ? Builders<ChatRoom>.Sort.Ascending(r => r.Name) :
-            sort == "created" ? Builders<ChatRoom>.Sort.Descending(r => r.CreatedAt) :
-                                Builders<ChatRoom>.Sort.Descending(r => r.LastMessageAt);
+        private static SortDefinition<ChatRoom> BuildMongoRoomSort(RoomSearchQuery q) =>
+            (q.SortBy, q.Direction) switch
+            {
+                (RoomSortBy.Name,        SortOrder.Asc)  => Builders<ChatRoom>.Sort.Ascending(r => r.Name),
+                (RoomSortBy.Name,        SortOrder.Desc) => Builders<ChatRoom>.Sort.Descending(r => r.Name),
+                (RoomSortBy.CreatedAt,   SortOrder.Asc)  => Builders<ChatRoom>.Sort.Ascending(r => r.CreatedAt),
+                (RoomSortBy.CreatedAt,   SortOrder.Desc) => Builders<ChatRoom>.Sort.Descending(r => r.CreatedAt),
+                (RoomSortBy.MemberCount, _)              => Builders<ChatRoom>.Sort.Descending("membersCount"),
+                (RoomSortBy.Activity,    SortOrder.Asc)  => Builders<ChatRoom>.Sort.Ascending(r => r.LastMessageAt),
+                _                                        => Builders<ChatRoom>.Sort.Descending(r => r.LastMessageAt),
+            };
     }
 }
